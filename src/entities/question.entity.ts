@@ -10,6 +10,7 @@ export class Question {
   @Column()
   content: string;
 
-  @Column()
+  // 일단 null로 처리 -> 나중에 가중치 부여
+  @Column({ nullable: true })
   type: string;
 }

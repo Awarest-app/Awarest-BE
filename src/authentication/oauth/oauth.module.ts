@@ -4,9 +4,10 @@ import { GoogleController } from './google/google.controller';
 import { GoogleService } from './google/google.service';
 import { GoogleStrategy } from './google/google.strategy';
 import { UsersModule } from '@/users/users.module';
+import { AuthModule } from '@/auth/auth.module';
 
 @Module({
-  imports: [UsersModule],
+  imports: [UsersModule, AuthModule],
   controllers: [GoogleController],
   providers: [GoogleService, GoogleStrategy],
 })
