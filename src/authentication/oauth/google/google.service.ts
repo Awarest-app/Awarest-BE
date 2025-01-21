@@ -11,7 +11,7 @@ export class GoogleService {
     const { email, username } = profile;
     let user = await this.usersService.findByEmail(email);
 
-    // 이미 로그인한 유저인지 판별
+    // 이미 로그인한 유저인지 판별 -> MOB단에서 막음
     if (user && !user.isOauthUser) {
       throw new Error('This email is already used for local login.');
     }

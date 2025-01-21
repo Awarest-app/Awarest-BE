@@ -2,7 +2,7 @@ version: '3.8'
 services:
   db:
     image: postgres:14
-    container_name: nest-postgres
+    container_name: coura-db
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
