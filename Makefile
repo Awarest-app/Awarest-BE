@@ -1,7 +1,7 @@
 # 변수 설정
 DOCKER_COMPOSE = docker compose
 APP_NAME = nest-app
-DB_NAME = nest-postgres
+DB_NAME = coura-db
 
 all: build up
 
@@ -29,21 +29,22 @@ restart:
 	@$(DOCKER_COMPOSE) up -d
 	@echo "Containers have been restarted."
 
-logs:
-	@$(DOCKER_COMPOSE) logs -f $(APP_NAME)
+local: local-db local-server
 
-psql:
-	@$(DOCKER_COMPOSE) exec $(DB_NAME) psql -U postgres -d coura
+local-server:
+	@ENV_FILE=.local npm run start:dev
 
-# NestJS 관련 명령어
-start:
-	@$(DOCKER_COMPOSE) exec $(APP_NAME) npm run start
+local-db:
+	@brew services start postgresql
 
-start-dev:
-	@$(DOCKER_COMPOSE) exec $(APP_NAME) npm run start:dev
+local-db-stop:
+	@brew services stop postgresql
 
-lint:
-	@$(DOCKER_COMPOSE) exec $(APP_NAME) npm run lint
 
-test:
-	@$(DOCKER_COMPOSE) exec $(APP_NAME) npm run test
+# create-db:
+# 	psql -U postgres -c "CREATE DATABASE coura;"
+
+# drop-db:
+# 	psql -U postgres -c "DROP DATABASE IF EXISTS coura;"
+
+.PHONY: all up down down-volumes build restart 

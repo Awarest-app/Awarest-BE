@@ -5,12 +5,14 @@ import { GoogleService } from './google.service';
 import { AuthService } from '@/authentication/auth/auth.service';
 import { Response } from 'express';
 import { AuthRequest } from '@/authentication/auth-request.interface';
+import { SurveyService } from '@/survey/survey.service';
 
 @Controller('auth/google')
 export class GoogleController {
   constructor(
     private readonly googleService: GoogleService,
     private readonly authService: AuthService,
+    private readonly surveyService: SurveyService,
   ) {}
 
   // 1) 구글 OAuth 시작 (리다이렉트)
@@ -27,7 +29,7 @@ export class GoogleController {
     // user 판별 및 DB 저장
     const user = await this.googleService.handleGoogleLogin(req.user);
 
-    // DB 저장 후 JWT 발급
+    // JWT 발급
     const token = this.authService.generateToken(user);
 
     console.log('JWT:', token);
@@ -35,7 +37,10 @@ export class GoogleController {
     // return res.json({ token });
     // res.redirect(`coura://login/token=${token}`);
 
-    res.redirect(`coura://login?token=${token}`);
+    // survey 한 유저인지 판별
+    const survey = this.surveyService.checkSurveyStatus(user.id);
+
+    res.redirect(`coura://login?token=${token}&survey=${survey}`);
     // res.redirect(`http://localhost:8081/login?token=${token}`);
   }
 }
