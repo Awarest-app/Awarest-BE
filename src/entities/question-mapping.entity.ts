@@ -13,13 +13,13 @@ export class QuestionMapping {
   id: number;
 
   @Column({ name: 'category_name' })
-  categoryName: string;
+  categoryName: string; // 예: "age_range", "job", "goal"
 
   @Column({ name: 'category_value' })
-  categoryValue: string;
+  categoryValue: string; // 예: "20대", "학생", "다이어트"
 
   @Column({ default: 1 })
-  weight: number;
+  weight: number; // 중요도 (가중치)
 
   @Column({ name: 'question_id' })
   questionId: number;

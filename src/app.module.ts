@@ -9,6 +9,11 @@ import { AuthModule } from './authentication/auth/auth.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { JwtModule } from '@nestjs/jwt';
+import { SurveyModule } from './survey/survey.module';
+import { PassportModule } from '@nestjs/passport';
+import { JwtStrategy } from './authentication/jwt/jwt.strategy';
+import { APP_GUARD, Reflector } from '@nestjs/core';
+import { JwtAuthGuard } from './authentication/jwt/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -16,14 +21,29 @@ import { JwtModule } from '@nestjs/jwt';
     JwtModule.register({
       secret: process.env.JWT_SECRET, // -> app에서 안하면 env가 안먹힘
       global: true,
-      signOptions: { expiresIn: '1h' }, // 토큰 만료 시간 등 -> TODO
+      signOptions: { expiresIn: '1d' }, // 토큰 만료 시간 등 -> TODO
     }),
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+
     TypeOrmModule.forRootAsync({ useFactory: ormConfig }),
     UsersModule,
     OauthModule,
     AuthModule,
+    SurveyModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+
+    //jwt 전역 미들웨어 설정
+    JwtStrategy,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    // meta data를 위한 reflector -> @public 처리
+    Reflector,
+  ],
+  exports: [JwtModule, PassportModule],
 })
 export class AppModule {}

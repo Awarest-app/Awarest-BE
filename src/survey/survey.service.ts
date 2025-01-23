@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Survey } from '@/entities/survey.entity';
+import { UserSurvey } from '@/type/survey.type';
 
 @Injectable()
 export class SurveyService {
@@ -13,36 +14,39 @@ export class SurveyService {
   // 설문 데이터 저장
   async saveSurveyResults(
     userId: number,
-    answers: { key: string; value: string }[],
+    answers: UserSurvey,
   ): Promise<Survey> {
     // 각 설문 항목을 필드에 매핑
-    const surveyData: Partial<Survey> = { userId };
+    try {
+      const surveyData: Partial<Survey> = { userId };
 
-    for (const answer of answers) {
-      switch (answer.key) {
-        case 'ageRange':
-          surveyData.ageRange = answer.value;
-          break;
-        case 'goal':
-          surveyData.goal = answer.value;
-          break;
-        case 'job':
-          surveyData.job = answer.value;
-          break;
-        case 'howHear':
-          surveyData.howHear = answer.value;
-          break;
-        case 'whyInstall':
-          surveyData.whyInstall = answer.value;
-          break;
-        default:
-          console.warn(`Unknown key: ${answer.key}`);
+      if (answers.ageRange) {
+        surveyData.ageRange = answers.ageRange;
       }
-    }
 
-    // 설문 데이터를 생성 및 저장
-    const survey = this.surveyRepository.create(surveyData);
-    return this.surveyRepository.save(survey);
+      if (answers.goal) {
+        surveyData.goal = answers.goal;
+      }
+
+      if (answers.job) {
+        surveyData.job = answers.job;
+      }
+
+      if (answers.how_hear) {
+        surveyData.howHear = answers.how_hear;
+      }
+
+      if (answers.noti !== undefined) {
+        surveyData.noti = answers.noti;
+      }
+
+      // 설문 데이터를 생성 및 저장
+      const survey = this.surveyRepository.create(surveyData);
+      return await this.surveyRepository.save(survey);
+    } catch (error) {
+      console.error('Error in saveSurveyResults:', error);
+      throw new InternalServerErrorException('Failed to save survey results');
+    }
   }
 
   // 모든 설문 데이터 조회
