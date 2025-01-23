@@ -22,6 +22,11 @@ export class UsersService {
     return this.usersRepository.findOneBy({ email });
   }
 
+  async findByUsername(username: string): Promise<User | null> {
+    // 유저 이름으로 사용자 찾기
+    return this.usersRepository.findOneBy({ username });
+  }
+
   async createOauthUser(data: {
     email: string;
     username: string;

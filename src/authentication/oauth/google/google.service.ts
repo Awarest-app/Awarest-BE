@@ -10,11 +10,17 @@ export class GoogleService {
   async handleGoogleLogin(profile: any) {
     const { email, username } = profile;
     let user = await this.usersService.findByEmail(email);
+    // const username_a = await this.usersService.findByUsername(username);
 
     // 이미 로그인한 유저인지 판별 -> MOB단에서 막음
-    if (user && !user.isOauthUser) {
+    console.log('user', user);
+    if (user && (!user.isOauthUser || !user.username)) {
       throw new Error('This email is already used for local login.');
     }
+    // console.log('username_a', username_a);
+    // if (username_a && username_a.isOauthUser) {
+    //   throw new Error('This username is already used for local login.');
+    // }
 
     if (!user) {
       user = await this.usersService.createOauthUser({

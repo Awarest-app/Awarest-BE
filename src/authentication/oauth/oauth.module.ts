@@ -6,10 +6,17 @@ import { GoogleStrategy } from './google/google.strategy';
 import { UsersModule } from '@/users/users.module';
 import { AuthModule } from '@/auth/auth.module';
 import { SurveyModule } from '@/survey/survey.module';
+import { PassportModule } from '@nestjs/passport';
+import { JwtStrategy } from '../jwt/jwt.strategy';
 
 @Module({
-  imports: [UsersModule, AuthModule, SurveyModule],
+  imports: [
+    UsersModule,
+    AuthModule,
+    SurveyModule,
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+  ],
   controllers: [GoogleController],
-  providers: [GoogleService, GoogleStrategy],
+  providers: [GoogleService, GoogleStrategy, JwtStrategy],
 })
 export class OauthModule {}
