@@ -46,9 +46,9 @@ export class GoogleController {
       // console.log('JWT:', token);
       // survey 한 유저인지 판별
       const survey = await this.surveyService.checkSurveyStatus(user.id);
-      // console.log('survey', survey);
+      console.log('survey', survey.hasSurvey);
 
-      res.redirect(`coura://login?token=${token}&survey=${survey}`);
+      res.redirect(`coura://login?token=${token}&survey=${survey.hasSurvey}`);
     } catch (error) {
       console.error('OAuth 콜백 에러:', error);
 

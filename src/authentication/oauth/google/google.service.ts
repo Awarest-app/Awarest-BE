@@ -17,10 +17,6 @@ export class GoogleService {
     if (user && (!user.isOauthUser || !user.username)) {
       throw new Error('This email is already used for local login.');
     }
-    // console.log('username_a', username_a);
-    // if (username_a && username_a.isOauthUser) {
-    //   throw new Error('This username is already used for local login.');
-    // }
 
     if (!user) {
       user = await this.usersService.createOauthUser({

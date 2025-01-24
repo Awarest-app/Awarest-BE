@@ -4,7 +4,7 @@ import { Subquestion } from '@/entities/subquestion.entity';
 import { Survey } from '@/entities/survey.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class QuestionService {
@@ -29,8 +29,9 @@ export class QuestionService {
       // 설문이 없는 사용자라면 빈 배열
       return [];
     }
+    console.log('survey', survey);
 
-    // 2) (Partial) Mapping 레코드를 가져올 조건 만들기 - (OR 조건)
+    // 2) (Partial)Mapping 레코드를 가져올 조건 만들기 - (OR 조건)
     //    - survey에 들어있는 항목들만 추출
     const orConditions = [];
     if (survey.ageRange) {
@@ -49,10 +50,12 @@ export class QuestionService {
     if (orConditions.length === 0) {
       return []; // 아무 항목도 없으면 반환
     }
+    console.log('orConditions', orConditions);
 
     // 3) question_mapping에서 조건에 맞는 레코드(OR) 검색
     const mappings = await this.qmRepo.find({ where: orConditions });
     // 예: (age_range=20대, job=학생, goal=다이어트)에 해당되는 레코드가 있으면 전부 가져옴.
+    console.log('mappings', mappings);
 
     // 4) questionId 별로 가중치 합산하기
     //    - 예) (20대=2, 학생=3, 다이어트=2) -> total=7
@@ -74,24 +77,24 @@ export class QuestionService {
 
     const questions = await this.questionRepo.findByIds(questionIds);
     // Subquestion도 같이 로드 (예시용)
-    const subquestions = await this.subqRepo.find({
-      where: { questionId: In(questionIds) },
-      order: { order: 'ASC' }, // 필요한 정렬 기준
-    });
+    // const subquestions = await this.subqRepo.find({
+    //   where: { questionId: In(questionIds) },
+    //   order: { order: 'ASC' }, // 필요한 정렬 기준
+    // });
 
     // 6) Question별로 subquestions 매핑
-    const subqMap = subquestions.reduce(
-      (acc, sq) => {
-        if (!acc[sq.questionId]) acc[sq.questionId] = [];
-        acc[sq.questionId].push(sq);
-        return acc;
-      },
-      {} as Record<number, Subquestion[]>,
-    );
+    // const subqMap = subquestions.reduce(
+    //   (acc, sq) => {
+    //     if (!acc[sq.questionId]) acc[sq.questionId] = [];
+    //     acc[sq.questionId].push(sq);
+    //     return acc;
+    //   },
+    //   {} as Record<number, Subquestion[]>,
+    // );
 
-    questions.forEach((q) => {
-      (q as any).subquestions = subqMap[q.questionId] ?? [];
-    });
+    // questions.forEach((q) => {
+    //   (q as any).subquestions = subqMap[q.questionId] ?? [];
+    // });
 
     // 7) 최종적으로 가중치가 높은 순으로 정렬
     questions.sort((a, b) => weightMap[b.questionId] - weightMap[a.questionId]);
