@@ -30,16 +30,4 @@ export class AuthService {
     // JWT 서명
     return this.jwtService.sign(payload);
   }
-
-  // async authSignIn(profile: { email: string; name: string }): Promise<User> {
-  //   const existingUser = await this.usersService.findByEmail(profile.email);
-  //   if (!existingUser) {
-  //     return this.usersService.create({
-  //       email: profile.email,
-  //       name: profile.name,
-  //       isOauthUser: true,
-  //     });
-  //   }
-  //   return existingUser;
-  // }
 }

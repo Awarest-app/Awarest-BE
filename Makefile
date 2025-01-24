@@ -2,6 +2,7 @@
 DOCKER_COMPOSE = docker compose
 APP_NAME = nest-app
 DB_NAME = coura-db
+SQL_FILE=dummy.sql
 
 all: build up
 
@@ -39,6 +40,12 @@ local-db:
 
 local-db-stop:
 	@brew services stop postgresql
+
+# .sql 스크립트 실행
+run-sql: local-db
+	@echo "Executing SQL script: $(SQL_FILE)"
+	@psql -U postgres -d coura -f $(SQL_FILE)
+# @psql -U postgres -d $(DB_NAME) -f $(SQL_FILE)
 
 
 # create-db:
