@@ -9,13 +9,23 @@ import {
   Param,
   Body,
   ParseIntPipe,
+  Req,
 } from '@nestjs/common';
 import { AnswersService } from './answers.service';
 import { Answer } from '../entities/answer.entity';
+import { jwtRequest } from '@/type/request.interface';
 
-@Controller('answers')
+@Controller('api/answers')
 export class AnswersController {
   constructor(private readonly answersService: AnswersService) {}
+
+  // 특정 사용자의 모든 답변 조회
+  @Get('me')
+  async getAnswersByUser(@Req() request: jwtRequest): Promise<any> {
+    const user = request.user as { userId: number; email: string };
+    console.log('answer:', user);
+    return this.answersService.getAnswersByUserOrdered(user.userId);
+  }
 
   // 모든 답변 조회
   @Get()
@@ -24,18 +34,10 @@ export class AnswersController {
   }
 
   // 특정 답변 조회
-  @Get(':id')
-  async getAnswerById(@Param('id', ParseIntPipe) id: number): Promise<Answer> {
-    return this.answersService.findOne(id);
-  }
-
-  // 특정 사용자의 모든 답변 조회
-  @Get('user/:userId')
-  async getAnswersByUser(
-    @Param('userId', ParseIntPipe) userId: number,
-  ): Promise<Answer[]> {
-    return this.answersService.findAnswersByUser(userId);
-  }
+  // @Get(':id')
+  // async getAnswerById(@Param('id', ParseIntPipe) id: number): Promise<Answer> {
+  //   return this.answersService.findOne(id);
+  // }
 
   // 답변 생성
   @Post()
@@ -43,12 +45,22 @@ export class AnswersController {
     return this.answersService.createAnswer(answerData);
   }
 
+  // 여러 개 생성 (배열 형태) -> 대부분 이럴듯
+  @Post('bulk')
+  async createAnswers(
+    @Body() answersData: Partial<Answer>[],
+  ): Promise<Answer[]> {
+    // console.log('answersData:', answersData);
+    return this.answersService.createAnswers(answersData);
+  }
+
   // 답변 업데이트
-  @Put(':id')
+  @Put('/update/:id')
   async updateAnswer(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateData: Partial<Answer>,
   ): Promise<Answer> {
+    // console.log('updateData:', updateData);
     return this.answersService.updateAnswer(id, updateData);
   }
 

@@ -18,8 +18,8 @@ export class QuestionService {
     @InjectRepository(Question)
     private questionRepo: Repository<Question>,
 
-    @InjectRepository(Subquestion)
-    private subqRepo: Repository<Subquestion>,
+    // @InjectRepository(Subquestion)
+    // private subqRepo: Repository<Subquestion>,
   ) {}
 
   async getQuestionsForUser(userId: number): Promise<Question[]> {
