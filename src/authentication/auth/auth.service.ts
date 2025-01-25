@@ -20,25 +20,14 @@ export class AuthService {
     return user;
   }
 
+  // TODO -> 나중에 jwt 폴더의 services로 이동할지 말ㄱ
   generateToken(user: User): string {
     // 원하는 payload를 구성
     const payload = {
-      sub: user.id, // 표준 클레임(sub)에 user.id를 넣는 패턴
+      userId: user.id, // 표준 클레임(sub)에 user.id를 넣는 패턴
       email: user.email, // 추가 정보
     };
     // JWT 서명
     return this.jwtService.sign(payload);
   }
-
-  // async authSignIn(profile: { email: string; name: string }): Promise<User> {
-  //   const existingUser = await this.usersService.findByEmail(profile.email);
-  //   if (!existingUser) {
-  //     return this.usersService.create({
-  //       email: profile.email,
-  //       name: profile.name,
-  //       isOauthUser: true,
-  //     });
-  //   }
-  //   return existingUser;
-  // }
 }
