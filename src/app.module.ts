@@ -18,6 +18,9 @@ import { QuestionModule } from './questions/question.module';
 import { SubquestionModule } from './subquestion/subquestion.module';
 import { QuestionMappingModule } from './questionMap/question-mapping.module';
 import { AnswersModule } from './answer/answers.module';
+import { UserQuestionModule } from './userQuestion/userQuestion.module';
+import { RedisModule } from './redis/redis.module';
+// import { RedisModule } from '@liaoliaots/nestjs-redis';
 
 @Module({
   imports: [
@@ -29,15 +32,16 @@ import { AnswersModule } from './answer/answers.module';
     }),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     TypeOrmModule.forRootAsync({ useFactory: ormConfig }),
+    RedisModule,
 
     UsersModule,
-    // AnswersModule,
     OauthModule,
     AuthModule,
     SurveyModule,
     QuestionModule,
     SubquestionModule,
     QuestionMappingModule,
+    UserQuestionModule,
     AnswersModule,
   ],
   controllers: [AppController],

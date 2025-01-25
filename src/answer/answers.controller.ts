@@ -48,10 +48,12 @@ export class AnswersController {
   // 여러 개 생성 (배열 형태) -> 대부분 이럴듯
   @Post('bulk')
   async createAnswers(
+    @Req() request: jwtRequest,
     @Body() answersData: Partial<Answer>[],
   ): Promise<Answer[]> {
+    const user = request.user as { userId: number; email: string };
     // console.log('answersData:', answersData);
-    return this.answersService.createAnswers(answersData);
+    return this.answersService.createAnswers(user.userId, answersData);
   }
 
   // 답변 업데이트

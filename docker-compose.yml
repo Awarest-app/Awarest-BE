@@ -14,6 +14,18 @@ services:
     networks:
       - nest-network
 
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - '6379:6379'
+    # 필요하면 volume, 환경 변수, 비밀번호 설정 등 추가 가능
+    # environment:
+    #   REDIS_PASSWORD: example
+    # command: ["redis-server", "--requirepass", "example"]
+    networks:
+      - nest-network
+
   nest-app:
     container_name: nest-app
     build: .

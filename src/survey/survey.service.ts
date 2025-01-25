@@ -36,9 +36,9 @@ export class SurveyService {
         surveyData.howHear = answers.how_hear;
       }
 
-      if (answers.noti !== undefined) {
-        surveyData.noti = answers.noti;
-      }
+      // if (answers.noti !== undefined) {
+      //   surveyData.noti = answers.noti;
+      // }
 
       // 설문 데이터를 생성 및 저장
       const survey = this.surveyRepository.create(surveyData);
