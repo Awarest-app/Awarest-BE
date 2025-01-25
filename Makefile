@@ -42,7 +42,7 @@ local-db-stop:
 	@brew services stop postgresql
 
 # .sql 스크립트 실행
-run-sql: local-db
+sql: local-db
 	@echo "Executing SQL script: $(SQL_FILE)"
 	@psql -U postgres -d coura -f $(SQL_FILE)
 # @psql -U postgres -d $(DB_NAME) -f $(SQL_FILE)
@@ -54,4 +54,4 @@ run-sql: local-db
 # drop-db:
 # 	psql -U postgres -c "DROP DATABASE IF EXISTS coura;"
 
-.PHONY: all up down down-volumes build restart 
+.PHONY: all up down down-volumes build restart sql
