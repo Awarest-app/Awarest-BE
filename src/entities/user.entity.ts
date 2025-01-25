@@ -39,14 +39,4 @@ export class User {
 
   @DeleteDateColumn({ name: 'deleted_at', nullable: true })
   deleted_at?: Date;
-
-  // survey 에서 처리
-  // @Column({ name: 'age_weight', default: 0 })
-  // ageWeight: number;
-
-  // @Column({ name: 'goal_weight', default: 0 })
-  // goalWeight: number;
-
-  // @Column({ name: 'job_weight', default: 0 })
-  // jobWeight: number;
 }

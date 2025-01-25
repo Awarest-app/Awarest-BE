@@ -30,7 +30,7 @@ restart:
 	@$(DOCKER_COMPOSE) up -d
 	@echo "Containers have been restarted."
 
-local: local-db local-server
+local: local-db local-redis local-server 
 
 local-server:
 	@ENV_FILE=.local npm run start:dev
@@ -40,6 +40,9 @@ local-db:
 
 local-db-stop:
 	@brew services stop postgresql
+
+local-redis:
+	@brew services start redis
 
 # .sql 스크립트 실행
 sql: local-db

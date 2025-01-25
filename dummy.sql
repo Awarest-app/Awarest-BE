@@ -6,6 +6,7 @@ TRUNCATE TABLE subquestion RESTART IDENTITY CASCADE;
 
 -- user sequence 초기화
 TRUNCATE TABLE users RESTART IDENTITY CASCADE;
+
 -- -- 2. users 테이블에 데이터 삽입
 INSERT INTO users (username, email, age, country, password, is_oauth_user, oauth_provider, created_at) VALUES
 ('유민규', 'dbalsrb0810@gmail.com', 25, 'USA', 'hashed_password_1', false, NULL, NOW());
@@ -14,29 +15,33 @@ INSERT INTO users (username, email, age, country, password, is_oauth_user, oauth
 -- ('alice_wonder', 'alice@example.com', 28, 'Canada', 'hashed_password_3', true, 'google', NOW());
 
 -- 3. questions 테이블에 데이터 삽입
-INSERT INTO questions (content, type) VALUES
-('What is your age range?', 'age_range'),
-('What is your current job?', 'job'),
-('What is your primary goal?', 'goal'),
-('How often do you exercise?', 'frequency'),
-('What is your preferred workout type?', 'workout_type'),
-('How many hours do you sleep daily?', 'sleep_hours'),
-('What is your dietary preference?', 'diet'),
-('How much time can you dedicate to training?', 'time_commitment'),
-('What is your fitness level?', 'fitness_level'),
-('Do you have any medical conditions?', 'medical_condition');
+INSERT INTO questions (content, type, depth) VALUES
+  ('What is your age range?', 'age_range', 1),
+  ('What is your current job?', 'job', 2),
+  ('What is your primary goal?', 'goal', 5),
+  ('How often do you exercise?', 'frequency', 9),
+  ('What is your preferred workout type?', 'workout_type', 7),
+  ('How many hours do you sleep daily?', 'sleep_hours', 2),
+  ('What is your dietary preference?', 'diet', 1),
+  ('How much time can you dedicate to training?', 'time_commitment', 8),
+  ('What is your fitness level?', 'fitness_level', 1),
+  ('Do you have any medical conditions?', 'medical_condition', 3);
 
 -- 4. question_mapping 테이블에 데이터 삽입
 INSERT INTO question_mapping (category_name, category_value, weight, question_id) VALUES
-('age_range', '18-22', 1, 1),
-('age_range', '23-26', 1, 1),
-('age_range', '27-34', 1, 1),
-('age_range', '35-44', 1, 1),
+('age_range', '18 - 22', 1, 1),
+('age_range', '23 - 26', 1, 1),
+('age_range', '27 - 34', 1, 1),
+('age_range', '35 - 44', 1, 1),
+('depth', '_depth', 1, 1),
+('depth', '_depth', 3, 1),
+('depth', '_depth', 3, 2),
+('depth', '_depth', 1, 2),
 ('job', 'Student', 1, 2),
 ('job', 'Retired', 1, 2),
 ('job', 'Self-employed', 1, 2),
 ('job', 'Unemployed', 1, 2),
-('goal', 'Find life direction', 2, 3),
+('goal', 'Find life direction', 2, 1),
 ('goal', 'Muscle Gain', 2, 3),
 ('goal', 'Find life direction', 2, 3),
 ('goal', 'Flexibility', 2, 3),
@@ -85,3 +90,9 @@ INSERT INTO answer (subquestion_id, user_id, content, submitted_at) VALUES
 (9, 1, 'Intermediate', NOW()),
 (10, 1, 'None', NOW());
 
+
+-- 8. user_question 테이블에 데이터 삽입
+INSERT INTO user_question (question_id, user_id) VALUES
+(1, 1),
+(6, 1),
+(10, 1);

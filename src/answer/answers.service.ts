@@ -13,6 +13,8 @@ export class AnswersService {
   constructor(
     @InjectRepository(Answer)
     private readonly answerRepository: Repository<Answer>,
+    // @InjectRepository(Answer)
+    // private readonly answerRepository: Repository<Answer>,
   ) {}
 
   // 모든 답변 조회
@@ -47,23 +49,17 @@ export class AnswersService {
   }
 
   // // 여러 Answer 생성
-  // async createAnswers(answersData: Partial<Answer>[]): Promise<Answer[]> {
-  //   // 1. 각 item을 엔티티로 변환
-  //   const answers = answersData.map((item) =>
-  //     this.answerRepository.create(item),
-  //   );
+  async createAnswers(userId: number, answersData: Partial<Answer>[]) {
+    const answers = answersData.map((item) => {
+      return this.answerRepository.create({
+        subquestionId: item.subquestionId,
+        content: (item as any).answer, // answer -> content로 매핑
+        userId,
+      });
+    });
 
-  //   // 2. 배열로 한 번에 저장
-  //   return this.answerRepository.save(answers);
-  // }
-  // answersData: Array<{ subQuestionId: number; answer: string }>
-  async createAnswers(answersData: Partial<Answer>[]) {
-    // 1) 엔티티로 변환
-    console.log('answersData:', answersData);
-    const answers = answersData.map((item) =>
-      this.answerRepository.create(item),
-    );
-    // 2) save()로 한 번에 저장
+    // Question Id 값 null으로 변경
+
     return this.answerRepository.save(answers);
   }
 

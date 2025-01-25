@@ -25,11 +25,12 @@ function ormConfig(): TypeOrmModuleOptions {
     port: parseInt(process.env.DB_PORT),
     username: process.env.POSTGRES_USER,
     password: process.env.POSTGRES_PASSWORD,
-    logging: true,
     synchronize: commonConf.SYNCHRONIZE,
     entities: commonConf.ENTITIES,
     migrations: commonConf.MIGRATIONS,
     migrationsRun: commonConf.MIGRATIONS_RUN,
+    //sql log
+    logging: false,
   };
 }
 
