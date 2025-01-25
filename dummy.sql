@@ -1,8 +1,17 @@
+-- 1. 테이블 초기화
+TRUNCATE TABLE answer RESTART IDENTITY CASCADE;
+-- TRUNCATE TABLE users RESTART IDENTITY CASCADE;
 TRUNCATE TABLE questions RESTART IDENTITY CASCADE;
 TRUNCATE TABLE question_mapping RESTART IDENTITY CASCADE;
 TRUNCATE TABLE subquestion RESTART IDENTITY CASCADE;
 
--- questions 테이블에 데이터 삽입
+-- -- 2. users 테이블에 데이터 삽입
+-- INSERT INTO users (username, email, age, country, password, is_oauth_user, oauthProvider, created_at) VALUES
+-- ('john_doe', 'john@example.com', 25, 'USA', 'hashed_password_1', false, NULL, NOW()),
+-- ('jane_smith', 'jane@example.com', 30, 'UK', 'hashed_password_2', false, NULL, NOW()),
+-- ('alice_wonder', 'alice@example.com', 28, 'Canada', 'hashed_password_3', true, 'google', NOW());
+
+-- 3. questions 테이블에 데이터 삽입
 INSERT INTO questions (content, type) VALUES
 ('What is your age range?', 'age_range'),
 ('What is your current job?', 'job'),
@@ -15,7 +24,7 @@ INSERT INTO questions (content, type) VALUES
 ('What is your fitness level?', 'fitness_level'),
 ('Do you have any medical conditions?', 'medical_condition');
 
--- question_mapping 테이블에 데이터 삽입
+-- 4. question_mapping 테이블에 데이터 삽입
 INSERT INTO question_mapping (category_name, category_value, weight, question_id) VALUES
 ('age_range', '18-22', 1, 1),
 ('age_range', '23-26', 1, 1),
@@ -38,7 +47,7 @@ INSERT INTO question_mapping (category_name, category_value, weight, question_id
 ('workout_type', 'Yoga', 1, 5),
 ('workout_type', 'Pilates', 1, 5);
 
--- subquestion 테이블에 데이터 삽입 (예약어 수정)
+-- 5. subquestion 테이블에 데이터 삽입 (예약어 수정)
 INSERT INTO subquestion (question_id, content, "order") VALUES
 (1, 'Please specify your exact age.', 1),
 (1, 'Are you under 18?', 2),
@@ -60,3 +69,16 @@ INSERT INTO subquestion (question_id, content, "order") VALUES
 (9, 'Have you had any formal fitness training before?', 2),
 (10, 'Please list any medical conditions.', 1),
 (10, 'Are you currently taking any medications?', 2);
+
+-- 6. answer 테이블에 데이터 삽입
+INSERT INTO answer (subquestion_id, user_id, content, submitted_at) VALUES
+(1, 1, 'I am 25 years old.', NOW()),
+(2, 1, 'No, I am not under 18.', NOW()),
+(3, 1, 'Engineer', NOW()),
+(4, 1, '5 years in this job.', NOW()),
+(5, 1, 'Short-term goals', NOW()),
+(6, 1, 'Improve overall health', NOW()),
+(7, 1, '3 times a week', NOW()),
+(8, 1, '1 hour per session', NOW()),
+(9, 1, 'Intermediate', NOW()),
+(10, 1, 'None', NOW());

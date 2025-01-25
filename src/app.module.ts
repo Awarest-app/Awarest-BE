@@ -17,6 +17,7 @@ import { JwtAuthGuard } from './authentication/jwt/jwt-auth.guard';
 import { QuestionModule } from './questions/question.module';
 import { SubquestionModule } from './subquestion/subquestion.module';
 import { QuestionMappingModule } from './questionMap/question-mapping.module';
+import { AnswersModule } from './answer/answers.module';
 
 @Module({
   imports: [
@@ -28,7 +29,9 @@ import { QuestionMappingModule } from './questionMap/question-mapping.module';
     }),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     TypeOrmModule.forRootAsync({ useFactory: ormConfig }),
+
     UsersModule,
+    AnswersModule,
     OauthModule,
     AuthModule,
     SurveyModule,
