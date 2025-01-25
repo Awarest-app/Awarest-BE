@@ -1,13 +1,15 @@
 -- 1. 테이블 초기화
 TRUNCATE TABLE answer RESTART IDENTITY CASCADE;
--- TRUNCATE TABLE users RESTART IDENTITY CASCADE;
 TRUNCATE TABLE questions RESTART IDENTITY CASCADE;
 TRUNCATE TABLE question_mapping RESTART IDENTITY CASCADE;
 TRUNCATE TABLE subquestion RESTART IDENTITY CASCADE;
 
+-- user sequence 초기화
+TRUNCATE TABLE users RESTART IDENTITY CASCADE;
 -- -- 2. users 테이블에 데이터 삽입
--- INSERT INTO users (username, email, age, country, password, is_oauth_user, oauthProvider, created_at) VALUES
--- ('john_doe', 'john@example.com', 25, 'USA', 'hashed_password_1', false, NULL, NOW()),
+INSERT INTO users (username, email, age, country, password, is_oauth_user, oauth_provider, created_at) VALUES
+('유민규', 'dbalsrb0810@gmail.com', 25, 'USA', 'hashed_password_1', false, NULL, NOW());
+
 -- ('jane_smith', 'jane@example.com', 30, 'UK', 'hashed_password_2', false, NULL, NOW()),
 -- ('alice_wonder', 'alice@example.com', 28, 'Canada', 'hashed_password_3', true, 'google', NOW());
 
@@ -82,3 +84,4 @@ INSERT INTO answer (subquestion_id, user_id, content, submitted_at) VALUES
 (8, 1, '1 hour per session', NOW()),
 (9, 1, 'Intermediate', NOW()),
 (10, 1, 'None', NOW());
+

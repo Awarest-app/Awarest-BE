@@ -32,13 +32,13 @@ export class User {
   isOauthUser: boolean; // OAuth 사용자 여부
 
   @Column({ nullable: true })
-  oauthProvider: string; // OAuth 공급자 (ex: 'google')
+  oauth_provider: string; // OAuth 공급자 (ex: 'google')
 
   @CreateDateColumn({ name: 'created_at' })
-  createdAt: Date;
+  created_at: Date;
 
   @DeleteDateColumn({ name: 'deleted_at', nullable: true })
-  deletedAt?: Date;
+  deleted_at?: Date;
 
   // survey 에서 처리
   // @Column({ name: 'age_weight', default: 0 })

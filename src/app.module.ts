@@ -31,13 +31,14 @@ import { AnswersModule } from './answer/answers.module';
     TypeOrmModule.forRootAsync({ useFactory: ormConfig }),
 
     UsersModule,
-    AnswersModule,
+    // AnswersModule,
     OauthModule,
     AuthModule,
     SurveyModule,
     QuestionModule,
     SubquestionModule,
     QuestionMappingModule,
+    AnswersModule,
   ],
   controllers: [AppController],
   providers: [

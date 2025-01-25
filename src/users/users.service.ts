@@ -40,7 +40,7 @@ export class UsersService {
       email: data.email,
       username: data.username,
       isOauthUser: true,
-      oauthProvider: data.oauthProvider,
+      oauth_provider: data.oauthProvider,
     });
 
     return this.usersRepository.save(newUser);

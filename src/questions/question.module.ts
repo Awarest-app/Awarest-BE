@@ -13,9 +13,9 @@ import { Survey } from '@/entities/survey.entity';
 @Module({
   imports: [
     // TypeOrmModule.forFeature([Question]),
-    TypeOrmModule.forFeature([Survey, Question, QuestionMapping, Subquestion]), // 필요한
+    TypeOrmModule.forFeature([Survey, Question, QuestionMapping]), // 필요한
     QuestionMappingModule,
-    SubquestionModule,
+    // SubquestionModule,
     SurveyModule,
   ],
   providers: [QuestionService],

@@ -26,8 +26,8 @@ export class SurveyController {
     @Body() body: { answers: UserSurvey },
   ) {
     const user = request.user;
-    console.log('user', user);
-    console.log('body', body.answers);
+    // console.log('user', user);
+    // console.log('body', body.answers);
     try {
       await this.surveyService.saveSurveyResults(user.userId, body.answers);
       return {
