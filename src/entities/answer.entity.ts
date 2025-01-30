@@ -28,11 +28,8 @@ export class Answer {
   @CreateDateColumn({ name: 'submitted_at' })
   submittedAt: Date;
 
-  @Column({ name: 'is_deleted', default: false })
-  isDeleted: boolean;
-
-  @Column({ name: 'deleted_at', type: 'date', nullable: true })
-  deletedAt: Date;
+  @Column({ name: 'is_modified', nullable: true })
+  isModified: Date;
 
   // fk_answer_subquestion
   @ManyToOne(() => Subquestion, { onDelete: 'CASCADE' })

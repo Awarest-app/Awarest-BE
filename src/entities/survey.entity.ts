@@ -23,8 +23,8 @@ export class Survey {
   @Column({ name: 'why_install', nullable: true })
   whyInstall: string;
 
-  @Column({ nullable: true })
-  noti: boolean;
+  // @Column({ nullable: true })
+  // noti: boolean;
 
   @OneToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })

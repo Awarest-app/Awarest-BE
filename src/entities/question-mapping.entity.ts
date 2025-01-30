@@ -18,6 +18,9 @@ export class QuestionMapping {
   @Column({ name: 'category_value' })
   categoryValue: string; // 예: "20대", "학생", "다이어트"
 
+  @Column({ nullable: true })
+  depth: string; //
+
   @Column({ default: 1 })
   weight: number; // 중요도 (가중치)
 

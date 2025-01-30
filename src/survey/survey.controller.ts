@@ -10,7 +10,6 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { SurveyService } from './survey.service';
-import { JwtAuthGuard } from '@/authentication/jwt/jwt-auth.guard';
 import { jwtRequest } from '@/type/request.interface';
 import { UserSurvey } from '@/type/survey.type';
 
@@ -19,15 +18,15 @@ export class SurveyController {
   constructor(private readonly surveyService: SurveyService) {}
 
   // 설문 결과 저장
-  @UseGuards(JwtAuthGuard)
-  @Post('save-survey')
+  // @UseGuards(JwtAuthGuard)
+  @Post('save')
   async saveSurveyResults(
     @Req() request: jwtRequest,
     @Body() body: { answers: UserSurvey },
   ) {
     const user = request.user;
-    console.log('user', user);
-    console.log('body', body.answers);
+    console.log('survey user  : ', user);
+    console.log('survey body  : ', body);
     try {
       await this.surveyService.saveSurveyResults(user.userId, body.answers);
       return {
@@ -40,12 +39,6 @@ export class SurveyController {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-  }
-
-  // 모든 설문 데이터 조회
-  @Get()
-  async findAll() {
-    return this.surveyService.findAll();
   }
 
   // 특정 사용자의 설문 데이터 조회

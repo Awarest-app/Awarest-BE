@@ -13,15 +13,8 @@ export class AnswersService {
   constructor(
     @InjectRepository(Answer)
     private readonly answerRepository: Repository<Answer>,
-
-    @InjectRepository(Subquestion)
-    private readonly subquestionRepository: Repository<Subquestion>,
-
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
-
-    @InjectRepository(Question)
-    private readonly questionRepository: Repository<Question>,
+    // @InjectRepository(Answer)
+    // private readonly answerRepository: Repository<Answer>,
   ) {}
 
   // 모든 답변 조회
@@ -55,9 +48,27 @@ export class AnswersService {
     return this.answerRepository.save(answer);
   }
 
+  // // 여러 Answer 생성
+  async createAnswers(userId: number, answersData: Partial<Answer>[]) {
+    const answers = answersData.map((item) => {
+      return this.answerRepository.create({
+        subquestionId: item.subquestionId,
+        content: (item as any).answer, // answer -> content로 매핑
+        userId,
+      });
+    });
+
+    // Question Id 값 null으로 변경
+
+    return this.answerRepository.save(answers);
+  }
+
   // 답변 업데이트
   async updateAnswer(id: number, updateData: Partial<Answer>): Promise<Answer> {
-    const answer = await this.findOne(id);
+    // const answer = await this.findOne(id);
+    const answer = await this.answerRepository.findOne({
+      where: { subquestionId: id },
+    });
     Object.assign(answer, updateData);
     return this.answerRepository.save(answer);
   }
@@ -68,5 +79,86 @@ export class AnswersService {
     if (result.affected === 0) {
       throw new NotFoundException(`Answer with ID ${id} not found.`);
     }
+  }
+
+  async getAnswersByUserOrdered(userId: number): Promise<
+    {
+      question: string;
+      subquestions: { text: string; answer: string; date: Date; id: number }[];
+    }[]
+  > {
+    // 1. 사용자에 해당하는 모든 answer를 조회하면서
+    //    subquestion, subquestion.question 관계를 함께 로드
+    const answers = await this.answerRepository.find({
+      where: { userId },
+      relations: ['subquestion', 'subquestion.question'],
+    });
+
+    // console.log('answers:', answers);
+
+    if (!answers.length) {
+      throw new NotFoundException(`No answers found for userId=${userId}`);
+    }
+
+    // 2. 질문(question)별로 답변을 그룹화하기 위한 자료구조
+    //    key: questionId, value: { question: string, subquestions: [...], lastSubmittedAt: Date }
+    const questionMap = new Map<
+      number,
+      {
+        question: string;
+        subquestions: {
+          text: string;
+          answer: string;
+          date: Date;
+          id: number;
+        }[];
+        lastSubmittedAt: Date; // 가장 최근 답변 시간
+      }
+    >();
+
+    for (const ans of answers) {
+      const subq = ans.subquestion;
+      const q = subq.question; // question entity
+
+      // questionId를 기준으로 그룹이 없다면 초기화
+      if (!questionMap.has(q.questionId)) {
+        questionMap.set(q.questionId, {
+          question: q.content,
+          subquestions: [],
+          lastSubmittedAt: ans.submittedAt,
+        });
+      }
+
+      const group = questionMap.get(q.questionId);
+
+      // subquestion 배열에 현재 답변 정보 푸시
+      group.subquestions.push({
+        text: subq.content,
+        answer: ans.content,
+        date: ans.submittedAt,
+        id: ans.subquestionId,
+      });
+
+      // 가장 최근에 답변한 시각 갱신
+      if (ans.submittedAt > group.lastSubmittedAt) {
+        group.lastSubmittedAt = ans.submittedAt;
+      }
+    }
+    // console.log('questionMap:', questionMap);
+
+    // 3. Map을 배열로 변환하고 "가장 최근 답변 시각" 기준으로 정렬
+    const result = Array.from(questionMap.values())
+      .sort((a, b) => b.lastSubmittedAt.getTime() - a.lastSubmittedAt.getTime())
+      .map((item) => ({
+        question: item.question,
+        subquestions: item.subquestions.map((sub) => ({
+          text: sub.text,
+          answer: sub.answer,
+          date: sub.date,
+          id: sub.id,
+        })),
+      }));
+
+    return result;
   }
 }

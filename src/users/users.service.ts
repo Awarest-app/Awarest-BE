@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
@@ -39,8 +39,8 @@ export class UsersService {
     const newUser = this.usersRepository.create({
       email: data.email,
       username: data.username,
-      isOauthUser: true,
-      oauthProvider: data.oauthProvider,
+      // isOauthUser: true,
+      oauth_provider: data.oauthProvider,
     });
 
     return this.usersRepository.save(newUser);
@@ -56,5 +56,19 @@ export class UsersService {
       where: { userId },
       relations: ['subquestion', 'question'], // 필요한 관계 로드
     });
+  }
+
+  // 사용자 정보 업데이트 메서드
+  async update(id: number, updateData: Partial<User>): Promise<User> {
+    const user = await this.findOne(id);
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+
+    // 업데이트할 데이터가 존재하면 할당
+    Object.assign(user, updateData);
+
+    // 업데이트된 사용자 저장
+    return this.usersRepository.save(user);
   }
 }
