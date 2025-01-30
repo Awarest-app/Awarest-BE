@@ -3,5 +3,5 @@ export type UserSurvey = {
   goal: string;
   job: string;
   how_hear: string;
-  noti: boolean;
+  // noti: boolean;
 };
