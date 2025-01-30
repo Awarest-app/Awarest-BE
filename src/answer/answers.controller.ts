@@ -52,7 +52,7 @@ export class AnswersController {
     @Body() answersData: Partial<Answer>[],
   ): Promise<Answer[]> {
     const user = request.user as { userId: number; email: string };
-    // console.log('answersData:', answersData);
+    console.log('answersData:', answersData);
     return this.answersService.createAnswers(user.userId, answersData);
   }
 

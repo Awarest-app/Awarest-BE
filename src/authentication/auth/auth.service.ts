@@ -11,23 +11,52 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  // jwt 유효한지 판단
-  async validateUser(email: string, password: string) {
-    const user = await this.usersService.findByEmail(email);
-    if (!user || user.isOauthUser || user.password !== password) {
-      return null;
-    }
-    return user;
+  // TODO -> 나중에 jwt 폴더의 services로 이동
+  // 액세스 토큰 생성
+  generateAccessToken(user: User): string {
+    const payload = { userId: user.id, email: user.email };
+    return this.jwtService.sign(payload, {
+      expiresIn: '15m', // 액세스 토큰 만료 시간
+    });
+  }
+
+  // 리프레시 토큰 생성
+  generateRefreshToken(user: User): string {
+    const payload = { userId: user.id, email: user.email };
+    return this.jwtService.sign(payload, {
+      expiresIn: '7d', // 리프레시 토큰 만료 시간
+      secret: `${process.env.JWT_REFRESH_SECRET}`, // 리프레시 토큰용 별도 시크릿 사용
+      // secret: 'somerefresh',
+    });
+  }
+
+  // 리프레시 토큰 검증
+  verifyRefreshToken(token: string): any {
+    return this.jwtService.verify(token, {
+      secret: `${process.env.JWT_REFRESH_SECRET}`,
+      // secret: 'somerefresh',
+    });
+  }
+
+  // 리프레시 토큰 저장
+  async saveRefreshToken(userId: number, refreshToken: string): Promise<void> {
+    await this.usersService.update(userId, { refresh_token: refreshToken });
+  }
+
+  // 리프레시 토큰 폐기
+  async revokeRefreshToken(userId: number): Promise<void> {
+    await this.usersService.update(userId, { refresh_token: null });
   }
 
   // TODO -> 나중에 jwt 폴더의 services로 이동할지 말ㄱ
-  generateToken(user: User): string {
-    // 원하는 payload를 구성
-    const payload = {
-      userId: user.id, // 표준 클레임(sub)에 user.id를 넣는 패턴
-      email: user.email, // 추가 정보
-    };
-    // JWT 서명
-    return this.jwtService.sign(payload);
-  }
+  // generateToken(user: User): string {
+  //   // 원하는 payload를 구성
+  //   const payload = {
+  //     userId: user.id, // 표준 클레임(sub)에 user.id를 넣는 패턴
+  //     email: user.email, // 추가 정보
+  //   };
+  //   // console.log('payload', payload);
+  //   // JWT 서명
+  //   return this.jwtService.sign(payload);
+  // }
 }

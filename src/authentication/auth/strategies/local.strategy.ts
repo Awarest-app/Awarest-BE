@@ -10,11 +10,11 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     super({ usernameField: 'email' }); // 이메일을 사용자 ID로 사용
   }
 
-  async validate(email: string, password: string): Promise<any> {
-    const user = await this.authService.validateUser(email, password);
-    if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-    return user;
-  }
+  // async validate(email: string, password: string): Promise<any> {
+  //   const user = await this.authService.validateUser(email, password);
+  //   if (!user) {
+  //     throw new UnauthorizedException('Invalid credentials');
+  //   }
+  //   return user;
+  // }
 }

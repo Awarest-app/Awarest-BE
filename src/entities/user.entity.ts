@@ -28,8 +28,11 @@ export class User {
   @Column({ nullable: true })
   password: string; // 일반 로그인 시 사용
 
-  @Column({ name: 'is_oauth_user', default: false })
-  isOauthUser: boolean; // OAuth 사용자 여부
+  @Column({ nullable: true })
+  refresh_token: string; // 리프레시 토큰 저장
+
+  // @Column({ name: 'is_oauth_user', default: false })
+  // isOauthUser: boolean; // OAuth 사용자 여부
 
   @Column({ nullable: true })
   oauth_provider: string; // OAuth 공급자 (ex: 'google')

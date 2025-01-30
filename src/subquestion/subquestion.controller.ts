@@ -45,11 +45,6 @@ export class SubquestionController {
     return this.subqService.create(createDto);
   }
 
-  @Get()
-  async findAll() {
-    return this.subqService.findAll();
-  }
-
   // @Put(':id')
   // async update(
   //   @Param('id') id: number,

@@ -4,7 +4,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Subquestion } from '@/entities/subquestion.entity';
 import { Repository } from 'typeorm';
 import { CreateSubquestionDto } from './dto/create-subquestion.dto';
-import { UpdateSubquestionDto } from './dto/update-subquestion.dto';
 import { Question } from '@/entities/question.entity';
 // import { CreateSubquestionDto, UpdateSubquestionDto } from './dto';
 
@@ -21,10 +20,6 @@ export class SubquestionService {
   async create(createDto: CreateSubquestionDto): Promise<Subquestion> {
     const subq = this.subqRepo.create(createDto);
     return this.subqRepo.save(subq);
-  }
-
-  async findAll(): Promise<Subquestion[]> {
-    return this.subqRepo.find();
   }
 
   async findById(questionId: number): Promise<{
