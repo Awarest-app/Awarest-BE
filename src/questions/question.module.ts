@@ -9,10 +9,19 @@ import { QuestionMapping } from '@/entities/question-mapping.entity';
 import { Survey } from '@/entities/survey.entity';
 import { UserQuestionModule } from '@/userQuestion/userQuestion.module';
 import { UserQuestion } from '@/entities/user-question.entity';
+import { Answer } from '@/entities/answer.entity';
+import { Profile } from '@/entities/profile.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Survey, Question, QuestionMapping, UserQuestion]), // 필요한
+    TypeOrmModule.forFeature([
+      Survey,
+      Question,
+      QuestionMapping,
+      UserQuestion,
+      Answer,
+      Profile,
+    ]), // 필요한
     QuestionMappingModule,
     UserQuestionModule,
     SurveyModule,

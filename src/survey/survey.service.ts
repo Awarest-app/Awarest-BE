@@ -36,10 +36,6 @@ export class SurveyService {
         surveyData.howHear = answers.how_hear;
       }
 
-      // if (answers.noti !== undefined) {
-      //   surveyData.noti = answers.noti;
-      // }
-
       // 설문 데이터를 생성 및 저장
       const survey = this.surveyRepository.create(surveyData);
       return await this.surveyRepository.save(survey);
@@ -49,10 +45,10 @@ export class SurveyService {
     }
   }
 
-  // 모든 설문 데이터 조회
-  async findAll(): Promise<Survey[]> {
-    return this.surveyRepository.find();
-  }
+  // // 모든 설문 데이터 조회
+  // async findAll(): Promise<Survey[]> {
+  //   return this.surveyRepository.find();
+  // }
 
   // 특정 사용자의 설문 데이터 조회
   async findByUser(userId: number): Promise<Survey[]> {

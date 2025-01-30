@@ -1,7 +1,7 @@
 // src/app.module.ts
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { ormConfig } from './orm.config';
 import { OauthModule } from './authentication/oauth/oauth.module';
@@ -12,7 +12,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { SurveyModule } from './survey/survey.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './authentication/jwt/jwt.strategy';
-import { APP_GUARD, Reflector } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR, Reflector } from '@nestjs/core';
 import { JwtAuthGuard } from './authentication/jwt/jwt-auth.guard';
 import { QuestionModule } from './questions/question.module';
 import { SubquestionModule } from './subquestion/subquestion.module';
@@ -20,16 +20,29 @@ import { QuestionMappingModule } from './questionMap/question-mapping.module';
 import { AnswersModule } from './answer/answers.module';
 import { UserQuestionModule } from './userQuestion/userQuestion.module';
 import { RedisModule } from './redis/redis.module';
-// import { RedisModule } from '@liaoliaots/nestjs-redis';
+import { ProfileModule } from './profile/profile.module';
+import { TokenRefreshInterceptor } from './authentication/jwt/token-refresh.interceptor';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }), // .env 파일 전역 로드
-    JwtModule.register({
-      secret: process.env.JWT_SECRET, // -> app에서 안하면 env가 안먹힘
-      global: true,
-      signOptions: { expiresIn: '1d' }, // 토큰 만료 시간 등 -> TODO
+    ConfigModule.forRoot({
+      isGlobal: true,
+      // envFilePath: process.env.ENV_FILE,
+    }), // .env 파일 전역 로드
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get<string>('JWT_SECRET'),
+        signOptions: { expiresIn: '15m' }, // 기본 액세스 토큰 만료 시간
+      }),
+      global: true, // JwtModule을 전역으로 설정
     }),
+    // JwtModule.register({
+    //   secret: process.env.JWT_SECRET, // -> app에서 안하면 env가 안먹힘
+    //   global: true,
+    //   signOptions: { expiresIn: '15m' }, // 토큰 만료 시간 등 -> TODO
+    // }),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     TypeOrmModule.forRootAsync({ useFactory: ormConfig }),
     RedisModule,
@@ -43,16 +56,18 @@ import { RedisModule } from './redis/redis.module';
     QuestionMappingModule,
     UserQuestionModule,
     AnswersModule,
+    ProfileModule,
   ],
   controllers: [AppController],
   providers: [
-    // AppService,
-
-    //jwt 전역 미들웨어 설정
-    JwtStrategy,
+    JwtStrategy, // JWT 전략 등록
     {
       provide: APP_GUARD,
-      useClass: JwtAuthGuard,
+      useClass: JwtAuthGuard, // JwtAuthGuard를 전역 가드로 설정
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TokenRefreshInterceptor, // TokenRefreshInterceptor를 전역 인터셉터로 설정
     },
     // meta data를 위한 reflector -> @public 처리
     Reflector,

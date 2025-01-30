@@ -1,116 +1,14 @@
-// import { QuestionMapping } from '@/entities/question-mapping.entity';
-// import { Question } from '@/entities/question.entity';
-// import { Survey } from '@/entities/survey.entity';
-// import { UserQuestion } from '@/entities/user-question.entity';
-// import { RedisService } from '@liaoliaots/nestjs-redis';
-// import { Injectable } from '@nestjs/common';
-// import { InjectRepository } from '@nestjs/typeorm';
-// import { Repository } from 'typeorm';
-// // import { InjectRedis } from '@liaoliaots/nestjs-redis';
-// // import { InjectRedis } from '@liaoliaots/nestjs-redis/dist/redis.decorators';
-
-// @Injectable()
-// export class QuestionService {
-//   constructor(
-//     @InjectRepository(Survey)
-//     private surveyRepo: Repository<Survey>,
-
-//     @InjectRepository(QuestionMapping)
-//     private questionMapRepo: Repository<QuestionMapping>,
-
-//     @InjectRepository(Question)
-//     private questionRepo: Repository<Question>,
-
-//     @InjectRepository(UserQuestion)
-//     private userQuestionRepo: Repository<UserQuestion>,
-
-//     private readonly redisService: RedisService,
-//   ) {}
-
-//   async getQuestionsForUser(userId: number): Promise<Question[]> {
-//     // 1) 사용자 설문 정보 가져오기
-//     const survey = await this.surveyRepo.findOne({ where: { userId } });
-//     if (!survey) {
-//       return [];
-//     }
-//     // console.log('survey', survey);
-
-//     // 2) (Partial)Mapping 레코드를 가져올 조건 만들기 - (OR 조건)
-//     //    - survey에 들어있는 항목들만 추출
-//     const orConditions = [];
-//     if (survey.ageRange) {
-//       orConditions.push({
-//         categoryName: 'age_range',
-//         categoryValue: survey.ageRange,
-//       });
-//     }
-//     if (survey.job) {
-//       orConditions.push({ categoryName: 'job', categoryValue: survey.job });
-//     }
-//     if (survey.goal) {
-//       orConditions.push({ categoryName: 'goal', categoryValue: survey.goal });
-//     }
-//     if (orConditions.length === 0) {
-//       return []; // 아무 항목도 없으면 반환
-//     }
-//     console.log('orConditions', orConditions);
-
-//     // 3) question_mapping에서 조건에 맞는 레코드(OR) 검색
-//     const mappings = await this.questionMapRepo.find({ where: orConditions });
-//     // 예: (age_range=20대, job=학생, goal=다이어트)에 해당되는 레코드가 있으면 전부 가져옴.
-//     console.log('mappings', mappings);
-
-//     // 4) 이미 사용자의 UserQuestion 테이블에 있는 questionId 가져오기
-//     const userQuestions = await this.userQuestionRepo.find({
-//       where: { userId },
-//     });
-//     const userQuestionIds = userQuestions.map((uq) => uq.questionId);
-//     console.log('userQuestionIds', userQuestionIds);
-
-//     // 5) userQuestionRepo에 있는 questionId를 제외한 mappings 필터링
-//     const filteredMappings = mappings.filter(
-//       (map) => !userQuestionIds.includes(map.questionId),
-//     );
-//     console.log('filteredMappings', filteredMappings);
-
-//     // 6) questionId 별로 가중치 합산하기
-//     //    - 예) (20대=2, 학생=3, 다이어트=2) -> total=7
-//     const weightMap: Record<number, number> = {};
-//     for (const map of filteredMappings) {
-//       if (!weightMap[map.questionId]) {
-//         weightMap[map.questionId] = 0;
-//       }
-//       weightMap[map.questionId] += map.weight;
-//     }
-
-//     // 7) 가중치가 부여된 questionId 들만 실제 Question 테이블에서 조회
-//     const questionIds = Object.keys(weightMap).map((idStr) =>
-//       parseInt(idStr, 10),
-//     );
-//     if (questionIds.length === 0) {
-//       return [];
-//     }
-
-//     const questions = await this.questionRepo.findByIds(questionIds);
-
-//     questions.sort((a, b) => weightMap[b.questionId] - weightMap[a.questionId]);
-
-//     // 8) 반환
-//     return questions;
-//   }
-// }
-
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import { Question } from '@/entities/question.entity';
 import { QuestionMapping } from '@/entities/question-mapping.entity';
 import { Survey } from '@/entities/survey.entity';
 import { UserQuestion } from '@/entities/user-question.entity';
 
-// 날짜 형식 처리를 위해 dayjs 사용 (선택사항)
-import dayjs from 'dayjs';
 import { RedisService } from '@/redis/redis.service';
+import { Answer } from '@/entities/answer.entity';
+import { Profile } from '@/entities/profile.entity';
 
 @Injectable()
 export class QuestionService {
@@ -127,7 +25,16 @@ export class QuestionService {
     @InjectRepository(UserQuestion)
     private userQuestionRepo: Repository<UserQuestion>,
 
+    @InjectRepository(Answer)
+    private answerRepo: Repository<Answer>,
+
+    @InjectRepository(Profile)
+    private profileRepo: Repository<Profile>,
+
     private readonly redisService: RedisService,
+
+    // private readonly connection: Connection, // 트랜잭션을 위해 Connection 주입
+    private readonly dataSource: DataSource, // 트랜잭션을 위해 Connection 주입
   ) {}
 
   /**
@@ -332,5 +239,151 @@ export class QuestionService {
     });
 
     return questions;
+  }
+
+  // /**
+  //  * 여러 개의 답변을 생성 및 저장
+  //  * @param userId 사용자 ID
+  //  * @param answersData 답변 데이터 배열
+  //  */
+  // async createAnswers(
+  //   userId: number,
+  //   answersData: Partial<Answer>[],
+  // ): Promise<Answer[]> {
+  //   const answers = answersData.map((item) => {
+  //     return this.answerRepo.create({
+  //       subquestionId: item.subquestionId,
+  //       content: (item as any).answer, // 'answer'를 'content'로 매핑
+  //       userId,
+  //     });
+  //   });
+
+  //   return this.answerRepo.save(answers);
+  // }
+
+  /**
+   * 여러 개의 답변을 생성 및 저장
+   * @param userId 사용자 ID
+   * @param answersData 답변 데이터 배열
+   */
+  async createAnswers(
+    userId: number,
+    answersData: Partial<Answer>[],
+  ): Promise<Answer[]> {
+    const answers = answersData.map((item) => {
+      return this.answerRepo.create({
+        subquestionId: item.subquestionId,
+        content: (item as any).answer, // 'answer'를 'content'로 매핑
+        userId,
+      });
+    });
+
+    return this.answerRepo.save(answers);
+  }
+
+  /**
+   * 유저가 여러 개의 답변을 제출
+   * @param userId 사용자 ID
+   * @param answersData 답변 데이터 배열 (subquestionId와 answer 내용)
+   */
+  async submitAnswers(
+    userId: number,
+    answersData: { subquestionId: number; answer: string }[],
+  ): Promise<void> {
+    const client = this.redisService.getClient();
+    const redisKey = `user_daily_questions:${userId}`;
+    const todayStr = this.getCurrentDateStr(); // 오늘 날짜 문자열
+
+    // 트랜잭션 시작
+    await this.dataSource.transaction(async (manager) => {
+      // Redis에서 현재 질문 세트 가져오기
+      const data = await client.get(redisKey);
+      if (!data) {
+        throw new BadRequestException('오늘의 질문 세트가 존재하지 않습니다.');
+      }
+
+      const parsed = JSON.parse(data) as {
+        date: string;
+        questions: { questionId: number; answered: boolean }[];
+      };
+
+      if (parsed.date !== todayStr) {
+        throw new BadRequestException(
+          '질문 세트의 날짜가 오늘과 일치하지 않습니다.',
+        );
+      }
+
+      let anyAnsweredChanged = false;
+
+      // 질문 ID를 키로 하는 맵 생성
+      const questionMap = new Map<
+        number,
+        { questionId: number; answered: boolean }
+      >();
+      parsed.questions.forEach((q) => questionMap.set(q.questionId, q));
+
+      // 제출된 답변을 기반으로 Redis 업데이트
+      answersData.forEach((a) => {
+        const q = questionMap.get(a.subquestionId);
+        if (q && !q.answered) {
+          q.answered = true;
+          anyAnsweredChanged = true;
+        }
+      });
+
+      // Redis에 업데이트된 질문 세트 저장
+      await client.set(
+        redisKey,
+        JSON.stringify({
+          ...parsed,
+          questions: Array.from(questionMap.values()),
+        }),
+      );
+
+      // 답변 상태가 변경되었을 경우 추가 작업 수행
+      if (anyAnsweredChanged) {
+        // 사용자 프로필 가져오기
+        const profile = await manager.findOne(Profile, { where: { userId } });
+        if (!profile) {
+          throw new BadRequestException('사용자의 프로필을 찾을 수 없습니다.');
+        }
+
+        const today = new Date();
+        const lastStreakDate = profile.lastStreakDate
+          ? new Date(profile.lastStreakDate)
+          : null;
+
+        const isSameDay =
+          lastStreakDate &&
+          lastStreakDate.toDateString() === today.toDateString();
+
+        if (!isSameDay) {
+          // day_streak 증가 및 lastStreakDate 업데이트
+          profile.day_streak += 1;
+          profile.lastStreakDate = today;
+          await manager.save(profile);
+        }
+
+        // 제출된 답변을 DB에 저장
+        const answerEntities = answersData.map((a) => {
+          return this.answerRepo.create({
+            subquestionId: a.subquestionId,
+            content: a.answer,
+            userId,
+            // user: { userId } as User,
+          });
+        });
+
+        await manager.save(answerEntities);
+
+        // UserQuestion 엔티티 업데이트: answered 필드 설정
+        // const subquestionIds = answersData.map((a) => a.subquestionId);
+        // await manager.update(
+        //   UserQuestion,
+        //   { userId, subquestionId: In(subquestionIds) },
+        //   // { answered: true },
+        // );
+      }
+    });
   }
 }
