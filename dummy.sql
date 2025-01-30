@@ -7,6 +7,8 @@ TRUNCATE TABLE subquestion RESTART IDENTITY CASCADE;
 -- user sequence 초기화
 TRUNCATE TABLE users RESTART IDENTITY CASCADE;
 
+TRUNCATE TABLE level RESTART IDENTITY CASCADE;
+
 -- -- 2. users 테이블에 데이터 삽입
 -- INSERT INTO users (username, email, age, country, password, is_oauth_user, oauth_provider, created_at) VALUES
 -- ('유민규', 'dbalsrb0810@gmail.com', 25, 'USA', 'hashed_password_1', false, 'google', NOW());
@@ -121,3 +123,15 @@ INSERT INTO subquestion (question_id, content, "order") VALUES
 --   '2025-01-01', -- joined_date: 가입 날짜
 --   true -- noti: 알림 (boolean 값)
 -- );
+
+INSERT INTO level (level, required_xp) VALUES
+(1, 50),
+(2, 200),
+(3, 500),
+(4, 1000),
+(5, 1500),
+(6, 2300),
+(7, 3100),
+(8, 4100),
+(9, 5100),
+(10, 7100);
