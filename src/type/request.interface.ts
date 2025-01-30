@@ -7,5 +7,5 @@ export interface AuthRequest extends Request {
 }
 
 export interface jwtRequest extends Request {
-  user: { userId: number; email: string };
+  user: { userId: number; email: string; username: string };
 }

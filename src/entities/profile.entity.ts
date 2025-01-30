@@ -8,6 +8,9 @@ export class Profile {
   @PrimaryColumn({ name: 'user_id' })
   userId: number; // userId를 기본 키로 설정
 
+  @Column()
+  username: string;
+
   @Column({ default: 0 })
   day_streak: number;
 

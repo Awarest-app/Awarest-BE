@@ -2,23 +2,67 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Profile } from '@/entities/profile.entity';
+import { ProfileResponseDto } from './dto/profile-response';
+import { Level } from '@/entities/level.entity';
+
+// src/profile/dto/profile-response.dto.ts
 
 @Injectable()
 export class ProfileService {
   constructor(
     @InjectRepository(Profile) private profileRepository: Repository<Profile>,
+    @InjectRepository(Level) private levelRepository: Repository<Level>,
   ) {}
 
   findAll(): Promise<Profile[]> {
     return this.profileRepository.find();
   }
 
-  async setNotification(userId: number, noti: boolean): Promise<void> {
-    console.log('userId, noti', userId, noti);
+  async setNotification(
+    userId: number,
+    username: string,
+    noti: boolean,
+  ): Promise<void> {
+    console.log('userId, username, noti', userId, username, noti);
 
     await this.profileRepository.upsert(
-      { userId, noti },
+      { userId, noti, username },
       { conflictPaths: ['userId'] },
     );
+  }
+
+  /**
+   * 특정 사용자의 프로필을 조회하여 필요한 필드만 반환
+   * @param userId 사용자 ID
+   * @returns ProfileResponseDto
+   */
+  async getProfileByUserId(userId: number): Promise<ProfileResponseDto> {
+    const profile = await this.profileRepository.findOne({ where: { userId } });
+    if (!profile) {
+      throw new NotFoundException('사용자의 프로필을 찾을 수 없습니다.');
+    }
+
+    // profile.level을 사용하여 required_xp 조회
+    const levelEntity = await this.levelRepository.findOne({
+      where: { level: profile.level },
+    });
+
+    if (!levelEntity) {
+      throw new NotFoundException('해당 레벨의 정보를 찾을 수 없습니다.');
+    }
+
+    // DTO로 변환하여 반환
+    const response: ProfileResponseDto = {
+      profileImg: '',
+      userName: profile.username,
+      memberSince: profile.joined_date,
+      dayStreak: profile.day_streak,
+      totalXP: profile.total_xp,
+      level: profile.level,
+      levelXP: levelEntity.required_xp,
+      totalAnswers: profile.total_answers,
+    };
+
+    return response;
   }
 }
