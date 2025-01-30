@@ -21,7 +21,10 @@ export class QuestionController {
     // (실제로는 Service 계층에서 한번에 처리해도 좋습니다)
     // 질문 ID를 기반으로 실제 질문 내용 조회
     const questionIds = questionSet.map((q) => q.questionId);
-    const questions = await this.questionService.getQuestionsByIds(questionIds);
+    const questions = await this.questionService.getQuestionsByIds(
+      user.userId,
+      questionIds,
+    );
 
     // 응답 포맷: QuestionProps 형식으로 변환
     const response = questions.map((question) => ({
@@ -47,12 +50,13 @@ export class QuestionController {
     const user = request.user as { userId: number; email: string };
     const userId = user.userId;
 
-    await this.questionService.submitAnswers(
+    const xpToAdd = await this.questionService.submitAnswers(
       userId,
       body.answers,
       body.questionName,
     );
 
-    return { success: true };
+    console.log('xpToAdd', xpToAdd);
+    return { success: true, xpAdded: xpToAdd };
   }
 }
