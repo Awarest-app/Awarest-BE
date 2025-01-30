@@ -289,10 +289,13 @@ export class QuestionService {
   async submitAnswers(
     userId: number,
     answersData: { subquestionId: number; answer: string }[],
+    questionName: string,
   ): Promise<void> {
     const client = this.redisService.getClient();
     const redisKey = `user_daily_questions:${userId}`;
     const todayStr = this.getCurrentDateStr(); // 오늘 날짜 문자열
+
+    console.log('questionName', questionName);
 
     // 트랜잭션 시작
     await this.dataSource.transaction(async (manager) => {
@@ -302,10 +305,13 @@ export class QuestionService {
         throw new BadRequestException('오늘의 질문 세트가 존재하지 않습니다.');
       }
 
+      console.log('data', data);
       const parsed = JSON.parse(data) as {
         date: string;
         questions: { questionId: number; answered: boolean }[];
       };
+
+      console.log('parsed', parsed);
 
       if (parsed.date !== todayStr) {
         throw new BadRequestException(
@@ -322,14 +328,28 @@ export class QuestionService {
       >();
       parsed.questions.forEach((q) => questionMap.set(q.questionId, q));
 
-      // 제출된 답변을 기반으로 Redis 업데이트
-      answersData.forEach((a) => {
-        const q = questionMap.get(a.subquestionId);
-        if (q && !q.answered) {
-          q.answered = true;
-          anyAnsweredChanged = true;
-        }
+      console.log('questionMap', questionMap);
+
+      const question = await this.questionRepo.findOne({
+        where: { content: questionName },
       });
+      if (!question) {
+        throw new BadRequestException('해당 질문 이름을 찾을 수 없습니다.');
+      }
+      const questionId = question.questionId;
+      console.log('questionId', questionId);
+
+      // 제출된 답변을 기반으로 Redis 업데이트
+      // answersData.forEach((a) => {
+      // const q = questionMap.get(a.subquestionId);
+      const q = questionMap.get(questionId);
+      if (q && !q.answered) {
+        q.answered = true;
+        anyAnsweredChanged = true;
+      }
+      // });
+      console.log('q', q);
+      console.log('answersData', answersData);
 
       // Redis에 업데이트된 질문 세트 저장
       await client.set(
@@ -339,6 +359,7 @@ export class QuestionService {
           questions: Array.from(questionMap.values()),
         }),
       );
+      console.log('redis1', anyAnsweredChanged);
 
       // 답변 상태가 변경되었을 경우 추가 작업 수행
       if (anyAnsweredChanged) {
@@ -347,23 +368,26 @@ export class QuestionService {
         if (!profile) {
           throw new BadRequestException('사용자의 프로필을 찾을 수 없습니다.');
         }
+        console.log('redis1-1');
 
         const today = new Date();
         const lastStreakDate = profile.lastStreakDate
           ? new Date(profile.lastStreakDate)
           : null;
 
+        console.log('redis1-3');
         const isSameDay =
           lastStreakDate &&
           lastStreakDate.toDateString() === today.toDateString();
 
+        console.log('redis2');
         if (!isSameDay) {
           // day_streak 증가 및 lastStreakDate 업데이트
           profile.day_streak += 1;
           profile.lastStreakDate = today;
           await manager.save(profile);
         }
-
+        console.log('redis3');
         // 제출된 답변을 DB에 저장
         const answerEntities = answersData.map((a) => {
           return this.answerRepo.create({
@@ -373,16 +397,17 @@ export class QuestionService {
             // user: { userId } as User,
           });
         });
+        console.log('answerEntities', answerEntities);
 
         await manager.save(answerEntities);
 
         // UserQuestion 엔티티 업데이트: answered 필드 설정
         // const subquestionIds = answersData.map((a) => a.subquestionId);
-        // await manager.update(
-        //   UserQuestion,
-        //   { userId, subquestionId: In(subquestionIds) },
-        //   // { answered: true },
-        // );
+        await manager.save(
+          UserQuestion,
+          { userId, questionId: questionId },
+          // { answered: true },
+        );
       }
     });
   }

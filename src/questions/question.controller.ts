@@ -37,12 +37,21 @@ export class QuestionController {
   @Post('/answer')
   async answerQuestion(
     @Req() request: jwtRequest,
-    @Body() body: { subquestionId: number; answer: string }[],
+    @Body()
+    body: {
+      answers: { subquestionId: number; answer: string }[];
+      questionName: string;
+    },
+    // @Body() body: { subquestionId: number; answer: string }[],
   ) {
     const user = request.user as { userId: number; email: string };
     const userId = user.userId;
 
-    await this.questionService.submitAnswers(userId, body);
+    await this.questionService.submitAnswers(
+      userId,
+      body.answers,
+      body.questionName,
+    );
 
     return { success: true };
   }
