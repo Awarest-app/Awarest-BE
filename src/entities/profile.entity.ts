@@ -38,6 +38,9 @@ export class Profile {
   @Column({ nullable: true })
   noti: boolean;
 
+  @Column({ nullable: true })
+  assets: number;
+
   // fk_profile_user: username -> users(username)
   // ManyToOne 매핑 시, users 테이블의 username이 Unique해야 합니다.
   // CASCADE: 부모 엔티티가 삭제되면 자식 엔티티도 삭제됩니다. -> User 가 사라지면 Profile도 사라짐
