@@ -65,4 +65,15 @@ export class ProfileService {
 
     return response;
   }
+
+  async updateUsername(userId: number, newUsername: string): Promise<void> {
+    const profile = await this.profileRepository.findOne({ where: { userId } });
+
+    if (!profile) {
+      throw new NotFoundException('사용자의 프로필을 찾을 수 없습니다.');
+    }
+
+    profile.username = newUsername;
+    await this.profileRepository.save(profile);
+  }
 }
