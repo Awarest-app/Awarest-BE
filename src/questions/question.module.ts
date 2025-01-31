@@ -11,6 +11,7 @@ import { UserQuestionModule } from '@/userQuestion/userQuestion.module';
 import { UserQuestion } from '@/entities/user-question.entity';
 import { Answer } from '@/entities/answer.entity';
 import { Profile } from '@/entities/profile.entity';
+import { Level } from '@/entities/level.entity';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { Profile } from '@/entities/profile.entity';
       UserQuestion,
       Answer,
       Profile,
+      Level,
     ]), // 필요한
     QuestionMappingModule,
     UserQuestionModule,

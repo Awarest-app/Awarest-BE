@@ -9,6 +9,7 @@ import { UserQuestion } from '@/entities/user-question.entity';
 import { RedisService } from '@/redis/redis.service';
 import { Answer } from '@/entities/answer.entity';
 import { Profile } from '@/entities/profile.entity';
+import { Level } from '@/entities/level.entity';
 
 @Injectable()
 export class QuestionService {
@@ -31,6 +32,7 @@ export class QuestionService {
     @InjectRepository(Profile)
     private profileRepo: Repository<Profile>,
 
+    @InjectRepository(Level) private levelRepository: Repository<Level>,
     private readonly redisService: RedisService,
 
     // private readonly connection: Connection, // 트랜잭션을 위해 Connection 주입
@@ -457,10 +459,15 @@ export class QuestionService {
 
         // 5. 레벨 업 로직
         // 예: 레벨업 임계값을 현재 레벨 * 100으로 설정
-        const levelUpThreshold = profile.level * 100;
-        if (profile.total_xp >= levelUpThreshold) {
+
+        // const levelUpThreshold = profile.level * 100;
+        const levelUpThreshold = await this.levelRepository.findOne({
+          where: { level: profile.level },
+        });
+
+        if (profile.total_xp >= levelUpThreshold.required_xp) {
           profile.level += 1;
-          profile.total_xp -= levelUpThreshold; // 남은 XP 유지
+          // profile.total_xp -= levelUpThreshold; // 남은 XP 유지
           // 추가적으로 레벨업 시 필요한 작업이 있다면 여기서 수행
         }
 

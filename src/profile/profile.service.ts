@@ -42,10 +42,20 @@ export class ProfileService {
       throw new NotFoundException('사용자의 프로필을 찾을 수 없습니다.');
     }
 
-    // profile.level을 사용하여 required_xp 조회
     const levelEntity = await this.levelRepository.findOne({
       where: { level: profile.level },
     });
+    // profile.level을 사용하여 required_xp 조회
+    let prevLevelEntity;
+    if (profile.level == 1) {
+      prevLevelEntity = { required_xp: 0 };
+    } else {
+      prevLevelEntity = await this.levelRepository.findOne({
+        where: { level: profile.level - 1 },
+      });
+    }
+
+    // console.log('levelEntity', levelEntity);
 
     if (!levelEntity) {
       throw new NotFoundException('해당 레벨의 정보를 찾을 수 없습니다.');
@@ -60,7 +70,9 @@ export class ProfileService {
       totalXP: profile.total_xp,
       level: profile.level,
       levelXP: levelEntity.required_xp,
+      prevXP: prevLevelEntity.required_xp,
       totalAnswers: profile.total_answers,
+      lastStreakDate: profile.lastStreakDate,
     };
 
     return response;
