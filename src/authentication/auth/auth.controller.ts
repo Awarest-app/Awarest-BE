@@ -7,9 +7,8 @@ import {
   HttpStatus,
   Post,
   Req,
-  UseGuards,
 } from '@nestjs/common';
-import { LocalAuthGuard } from './guards/local_auth.guard';
+// import { LocalAuthGuard } from './guards/local_auth.guard';
 import { AuthService } from './auth.service';
 import { UsersService } from '@/users/users.service';
 import { jwtRequest } from '@/type/request.interface';
@@ -26,7 +25,7 @@ export class AuthController {
   ) {}
 
   @Post('login')
-  @UseGuards(LocalAuthGuard)
+  // @UseGuards(LocalAuthGuard)
   login(@Req() req) {
     return { message: 'Login successful', user: req.user };
   }
@@ -72,6 +71,7 @@ export class AuthController {
     try {
       console.log('logout');
       const jwtUser = request.user;
+
       const user = await this.usersService.findOne(jwtUser.userId);
       // 리프레시 토큰 검증
       // const payload = this.authService.verifyRefreshToken(user.refresh_token);
