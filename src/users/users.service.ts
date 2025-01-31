@@ -71,4 +71,24 @@ export class UsersService {
     // 업데이트된 사용자 저장
     return this.usersRepository.save(user);
   }
+
+  async updateUsername(userId: number, newUsername: string): Promise<void> {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+
+    if (!user) {
+      throw new NotFoundException('사용자를 찾을 수 없습니다.');
+    }
+
+    user.username = newUsername;
+    await this.usersRepository.save(user);
+  }
+
+  async deleteUser(userId: number): Promise<void> {
+    const user = await this.findOne(userId);
+    if (!user) {
+      throw new NotFoundException('사용자를 찾을 수 없습니다.');
+    }
+
+    await this.usersRepository.delete(userId);
+  }
 }

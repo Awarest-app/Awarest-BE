@@ -14,7 +14,11 @@ export class AuthService {
   // TODO -> 나중에 jwt 폴더의 services로 이동
   // 액세스 토큰 생성
   generateAccessToken(user: User): string {
-    const payload = { userId: user.id, email: user.email };
+    const payload = {
+      userId: user.id,
+      email: user.email,
+      username: user.username,
+    };
     return this.jwtService.sign(payload, {
       expiresIn: '15m', // 액세스 토큰 만료 시간
     });
@@ -22,7 +26,11 @@ export class AuthService {
 
   // 리프레시 토큰 생성
   generateRefreshToken(user: User): string {
-    const payload = { userId: user.id, email: user.email };
+    const payload = {
+      userId: user.id,
+      email: user.email,
+      username: user.username,
+    };
     return this.jwtService.sign(payload, {
       expiresIn: '7d', // 리프레시 토큰 만료 시간
       secret: `${process.env.JWT_REFRESH_SECRET}`, // 리프레시 토큰용 별도 시크릿 사용
