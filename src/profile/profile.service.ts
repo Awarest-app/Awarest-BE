@@ -73,6 +73,7 @@ export class ProfileService {
       prevXP: prevLevelEntity.required_xp,
       totalAnswers: profile.total_answers,
       lastStreakDate: profile.lastStreakDate,
+      noti: profile.noti,
     };
 
     return response;

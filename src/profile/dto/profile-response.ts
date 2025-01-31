@@ -9,4 +9,5 @@ export class ProfileResponseDto {
   totalAnswers: number;
   lastStreakDate: Date;
   prevXP: number;
+  noti: boolean;
 }
