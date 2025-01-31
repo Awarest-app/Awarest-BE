@@ -1,11 +1,23 @@
-import { Body, Controller, Get, Post, Req } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Patch,
+  Post,
+  Req,
+} from '@nestjs/common';
 import { ProfileService } from './profile.service';
 import { jwtRequest } from '@/type/request.interface';
 import { ProfileResponseDto } from './dto/profile-response';
+import { UsersService } from '@/users/users.service';
 
 @Controller('api/profile')
 export class ProfileController {
-  constructor(private readonly profileService: ProfileService) {}
+  constructor(
+    private readonly profileService: ProfileService,
+    private readonly userService: UsersService,
+  ) {}
 
   @Post('noti-permission')
   async getNotiPermission(
@@ -35,5 +47,26 @@ export class ProfileController {
   async getProfile(@Req() request: jwtRequest): Promise<ProfileResponseDto> {
     const user = request.user as { userId: number; email: string };
     return this.profileService.getProfileByUserId(user.userId);
+  }
+
+  @Patch('username')
+  async updateUsername(
+    @Req() request: jwtRequest,
+    @Body() body: { newUsername: string },
+  ) {
+    const user = request.user;
+    const { newUsername } = body;
+
+    if (!newUsername || newUsername.trim() === '') {
+      throw new BadRequestException('새로운 사용자명을 입력해야 합니다.');
+    }
+
+    // User 테이블의 username 변경
+    await this.userService.updateUsername(user.userId, newUsername);
+
+    // Profile 테이블의 username 변경
+    await this.profileService.updateUsername(user.userId, newUsername);
+
+    return { message: '사용자명이 성공적으로 변경되었습니다.' };
   }
 }
