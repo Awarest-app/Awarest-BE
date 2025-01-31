@@ -7,4 +7,6 @@ export class ProfileResponseDto {
   levelXP: number;
   level: number;
   totalAnswers: number;
+  lastStreakDate: Date;
+  prevXP: number;
 }
