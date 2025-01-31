@@ -230,12 +230,43 @@ export class QuestionService {
     return validQuestionIds.slice(0, neededCount);
   }
 
-  async getQuestionsByIds(questionIds: number[]): Promise<Question[]> {
+  // async getQuestionsByIds(questionIds: number[]): Promise<Question[]> {
+  //   if (questionIds.length === 0) return [];
+
+  //   // In 연산자를 사용하여 주어진 ID 배열에 해당하는 엔티티를 검색
+  //   const questions = await this.questionRepo.findBy({
+  //     questionId: In(questionIds),
+  //   });
+
+  //   return questions;
+  // }
+  async getQuestionsByIds(
+    userId: number,
+    questionIds: number[],
+  ): Promise<Question[]> {
     if (questionIds.length === 0) return [];
 
-    // In 연산자를 사용하여 주어진 ID 배열에 해당하는 엔티티를 검색
+    // 1. 사용자가 이미 답변한 questionIds 가져오기
+    const usedQuestionIds = await this.userQuestionRepo
+      .find({
+        where: {
+          userId,
+          questionId: In(questionIds),
+        },
+        select: ['questionId'],
+      })
+      .then((uqs) => uqs.map((uq) => uq.questionId));
+
+    // 2. 사용된 questionIds 제외하기
+    const filteredQuestionIds = questionIds.filter(
+      (id) => !usedQuestionIds.includes(id),
+    );
+
+    if (filteredQuestionIds.length === 0) return [];
+
+    // 3. 남은 질문들 가져오기
     const questions = await this.questionRepo.findBy({
-      questionId: In(questionIds),
+      questionId: In(filteredQuestionIds),
     });
 
     return questions;
@@ -285,12 +316,15 @@ export class QuestionService {
    * 유저가 여러 개의 답변을 제출
    * @param userId 사용자 ID
    * @param answersData 답변 데이터 배열 (subquestionId와 answer 내용)
+   * @param questionName 질문 이름
+   * @returns 추가된 XP 값
    */
   async submitAnswers(
     userId: number,
     answersData: { subquestionId: number; answer: string }[],
     questionName: string,
-  ): Promise<void> {
+  ): Promise<number> {
+    // 반환 타입을 number로 변경
     const client = this.redisService.getClient();
     const redisKey = `user_daily_questions:${userId}`;
     const todayStr = this.getCurrentDateStr(); // 오늘 날짜 문자열
@@ -298,7 +332,8 @@ export class QuestionService {
     console.log('questionName', questionName);
 
     // 트랜잭션 시작
-    await this.dataSource.transaction(async (manager) => {
+    const xpToAdd = await this.dataSource.transaction(async (manager) => {
+      // 트랜잭션 결과를 변수에 할당
       // Redis에서 현재 질문 세트 가져오기
       const data = await client.get(redisKey);
       if (!data) {
@@ -330,6 +365,7 @@ export class QuestionService {
 
       console.log('questionMap', questionMap);
 
+      // 질문 이름으로 질문 찾기
       const question = await this.questionRepo.findOne({
         where: { content: questionName },
       });
@@ -340,14 +376,11 @@ export class QuestionService {
       console.log('questionId', questionId);
 
       // 제출된 답변을 기반으로 Redis 업데이트
-      // answersData.forEach((a) => {
-      // const q = questionMap.get(a.subquestionId);
       const q = questionMap.get(questionId);
       if (q && !q.answered) {
         q.answered = true;
         anyAnsweredChanged = true;
       }
-      // });
       console.log('q', q);
       console.log('answersData', answersData);
 
@@ -402,13 +435,46 @@ export class QuestionService {
         await manager.save(answerEntities);
 
         // UserQuestion 엔티티 업데이트: answered 필드 설정
-        // const subquestionIds = answersData.map((a) => a.subquestionId);
         await manager.save(
           UserQuestion,
           { userId, questionId: questionId },
-          // { answered: true },
+          // { answered: true }, // 필요에 따라 업데이트 방식 조정
         );
+
+        // 추가 요구 사항 처리 시작
+        // 1. 질문의 depth 가져오기
+        const questionDepth = question.depth;
+        // console.log('questionDepth', questionDepth);
+
+        // 2. depth에 따른 XP 계산
+        const xpToAdd = questionDepth < 5 ? 50 : 80;
+
+        // 3. total_xp 업데이트
+        profile.total_xp += xpToAdd;
+
+        // 4. 총 답변 수 증가
+        profile.total_answers += 1;
+
+        // 5. 레벨 업 로직
+        // 예: 레벨업 임계값을 현재 레벨 * 100으로 설정
+        const levelUpThreshold = profile.level * 100;
+        if (profile.total_xp >= levelUpThreshold) {
+          profile.level += 1;
+          profile.total_xp -= levelUpThreshold; // 남은 XP 유지
+          // 추가적으로 레벨업 시 필요한 작업이 있다면 여기서 수행
+        }
+
+        // 6. 프로필 저장
+        await manager.save(profile);
+
+        // 7. 성공한 질문의 XP 반환
+        console.log(' inner xpToAdd', xpToAdd);
+        return xpToAdd;
       }
+      // 답변 상태가 변경되지 않았을 경우 0 반환
+      return 0;
     });
+
+    return xpToAdd; // 트랜잭션 결과 반환
   }
 }

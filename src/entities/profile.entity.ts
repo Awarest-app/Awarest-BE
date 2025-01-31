@@ -8,6 +8,9 @@ export class Profile {
   @PrimaryColumn({ name: 'user_id' })
   userId: number; // userId를 기본 키로 설정
 
+  @Column()
+  username: string;
+
   @Column({ default: 0 })
   day_streak: number;
 
@@ -34,6 +37,9 @@ export class Profile {
 
   @Column({ nullable: true })
   noti: boolean;
+
+  @Column({ nullable: true })
+  assets: number;
 
   // fk_profile_user: username -> users(username)
   // ManyToOne 매핑 시, users 테이블의 username이 Unique해야 합니다.

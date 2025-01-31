@@ -97,7 +97,8 @@ export class AnswersService {
     // console.log('answers:', answers);
 
     if (!answers.length) {
-      throw new NotFoundException(`No answers found for userId=${userId}`);
+      return [];
+      // throw new NotFoundException(`No answers found for userId=${userId}`);
     }
 
     // 2. 질문(question)별로 답변을 그룹화하기 위한 자료구조
