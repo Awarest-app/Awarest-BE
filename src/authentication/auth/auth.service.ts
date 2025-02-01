@@ -55,16 +55,4 @@ export class AuthService {
   async revokeRefreshToken(userId: number): Promise<void> {
     await this.usersService.update(userId, { refresh_token: null });
   }
-
-  // TODO -> 나중에 jwt 폴더의 services로 이동할지 말ㄱ
-  // generateToken(user: User): string {
-  //   // 원하는 payload를 구성
-  //   const payload = {
-  //     userId: user.id, // 표준 클레임(sub)에 user.id를 넣는 패턴
-  //     email: user.email, // 추가 정보
-  //   };
-  //   // console.log('payload', payload);
-  //   // JWT 서명
-  //   return this.jwtService.sign(payload);
-  // }
 }

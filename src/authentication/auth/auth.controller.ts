@@ -7,11 +7,13 @@ import {
   HttpStatus,
   Post,
   Req,
+  Res,
 } from '@nestjs/common';
 // import { LocalAuthGuard } from './guards/local_auth.guard';
 import { AuthService } from './auth.service';
 import { UsersService } from '@/users/users.service';
 import { jwtRequest } from '@/type/request.interface';
+import { Response } from 'express';
 
 class RefreshTokenDto {
   refreshToken: string;
@@ -67,7 +69,7 @@ export class AuthController {
 
   // 로그아웃 시 리프레시 토큰 폐기
   @Post('logout')
-  async logout(@Req() request: jwtRequest) {
+  async logout(@Req() request: jwtRequest, @Res() res: Response) {
     try {
       console.log('logout');
       const jwtUser = request.user;
@@ -75,7 +77,6 @@ export class AuthController {
       const user = await this.usersService.findOne(jwtUser.userId);
       // 리프레시 토큰 검증
       // const payload = this.authService.verifyRefreshToken(user.refresh_token);
-
       // 사용자 찾기
       // const user = await this.usersService.findOne(payload.userId);
       // if (!user || user.refresh_token !== refreshToken) {
@@ -88,7 +89,9 @@ export class AuthController {
       // 리프레시 토큰 폐기
       await this.authService.revokeRefreshToken(user.id);
 
-      return { message: '성공적으로 로그아웃되었습니다.' };
+      // return { message: '성공적으로 로그아웃되었습니다.' };
+      // res.redirected('https://accounts.google.com/logout');
+      return res.redirect('https://accounts.google.com/logout');
     } catch (error) {
       throw new HttpException(
         '유효하지 않거나 만료된 리프레시 토큰입니다.',
