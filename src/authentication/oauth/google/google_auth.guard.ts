@@ -24,7 +24,7 @@
 //     return Boolean(result);
 //   }
 // }
-import { ExecutionContext, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 
 @Injectable()
@@ -33,14 +33,14 @@ export class GoogleAuthGuard extends AuthGuard('google') {
     super();
   }
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
-    const result = await super.canActivate(context);
-    const request = context.switchToHttp().getRequest();
+  // async canActivate(context: ExecutionContext): Promise<boolean> {
+  //   const result = await super.canActivate(context);
+  //   const request = context.switchToHttp().getRequest();
 
-    // ✅ URL 파라미터에 `prompt=select_account` 강제 적용
-    request.query.prompt = 'select_account';
-    request.query.access_type = 'offline'; // ✅ 리프레시 토큰 요청
+  //   // ✅ URL 파라미터에 `prompt=select_account` 강제 적용
+  //   request.query.prompt = 'select_account';
+  //   request.query.access_type = 'offline'; // ✅ 리프레시 토큰 요청
 
-    return Boolean(result);
-  }
+  //   return Boolean(result);
+  // }
 }

@@ -12,6 +12,13 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: process.env.GOOGLE_CALLBACK_URL,
       scope: ['email', 'profile'],
+
+      // 1) 항상 계정 선택 창이 뜨도록
+      prompt: 'select_account',
+      // prompt: 'consent',
+
+      // 2) 리프레시 토큰을 발급받기 위해
+      // accessType: 'offline',
     });
   }
 
