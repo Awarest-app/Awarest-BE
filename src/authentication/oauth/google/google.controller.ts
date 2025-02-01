@@ -75,49 +75,4 @@ export class GoogleController {
       );
     }
   }
-
-  // 2) 구글 OAuth 콜백
-  // @Get('callback')
-  // @Public() // 인증 제외
-  // @UseGuards(GoogleAuthGuard)
-  // async googleAuthCallback(@Req() req: AuthRequest, @Res() res: Response) {
-  //   try {
-  //     // 사용자 식별 및 DB 저장 후 JWT 생성
-  //     console.log('req.user', req.user);
-  //     const user = await this.googleService.handleGoogleLogin(req.user);
-
-  //     // JWT 토큰 생성
-  //     const token = this.authService.generateAccessToken(user);
-
-  //     // 사용자가 설문조사를 완료했는지 확인
-  //     const survey = await this.surveyService.checkSurveyStatus(user.id);
-  //     // console.log('survey', survey.hasSurvey);
-
-  //     // 클라이언트 애플리케이션으로 토큰과 설문조사 상태를 포함하여 리다이렉트
-  //     res.redirect(`coura://login?token=${token}&survey=${survey.hasSurvey}`);
-  //   } catch (error) {
-  //     console.error('OAuth 콜백 에러:', error);
-
-  //     // OAuth2 관련 오류인지 확인 (예: 토큰 만료)
-  //     // if (error instanceof OAuth2Error) {
-  //     //   // 필요에 따라 error.message 또는 error.code를 추가로 검사할 수 있습니다
-  //     //   // 원하는 경우 오류 파라미터와 함께 로그인 페이지로 리다이렉트
-  //     //   return res.redirect('coura://login?error=token_expired');
-  //     // }
-
-  //     // 특정 NestJS 예외 처리
-  //     if (error instanceof ConflictException) {
-  //       throw new HttpException(
-  //         { message: error.message, code: 'CONFLICT' },
-  //         HttpStatus.CONFLICT,
-  //       );
-  //     }
-
-  //     // 기타 예상치 못한 오류 처리
-  //     throw new HttpException(
-  //       { message: '예상치 못한 오류가 발생했습니다.', code: 'UNKNOWN_ERROR' },
-  //       HttpStatus.INTERNAL_SERVER_ERROR,
-  //     );
-  //   }
-  // }
 }

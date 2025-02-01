@@ -62,7 +62,7 @@ export class AnswersController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updateData: Partial<Answer>,
   ): Promise<Answer> {
-    // console.log('updateData:', updateData);
+    console.log('\n updateData: id ', updateData, id);
     return this.answersService.updateAnswer(id, updateData);
   }
 
