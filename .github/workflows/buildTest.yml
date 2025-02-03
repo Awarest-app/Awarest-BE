@@ -41,6 +41,7 @@ jobs:
         run: zip -r ./$GITHUB_SHA.zip . -x "node_modules/*" "coverage/*" "src/*" "test/*" "README.md" "*.git*"
         shell: bash
 
+      # 위에서 생성한 IAM 사용자 정보를 넣어 자격 증명을 수행합니다.
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -54,7 +55,7 @@ jobs:
 
       # CodeDeploy에게 deployment를 생성하도록 요청합니다.
       - name: Request Deployment
-        run: aws deploy create-deployment --ap
+        run: aws deploy create-deployment --application-name $AWS_CODEDEPLOY_APPLICATION_NAME --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name $AWS_CODEDEPLOY_DEPLOYMENT_GROUP_NAME --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=$PROJECT_NAME/$GITHUB_SHA.zip
 
 env:
   S3_BUCKET_NAME: coura-server-bucket # S3 버킷 이름입니다.
