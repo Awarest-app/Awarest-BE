@@ -60,5 +60,5 @@ jobs:
 env:
   S3_BUCKET_NAME: coura-server-bucket # S3 버킷 이름입니다.
   PROJECT_NAME: coura-be # S3 버킷 내 폴더 이름입니다. 임의로 정하면 알아서 생성해줍니다.
-  AWS_CODEDEPLOY_APPLICATION_NAME: coura-code-depoly # CodeDeploy 애플리케이션 이름입니다.
-  AWS_CODEDEPLOY_DEPLOYMENT_GROUP_NAME: coura-codedepoly-group # CodeDeploy 배포 그룹 이름입니다.
+  AWS_CODEDEPLOY_APPLICATION_NAME: coura-code-deploy # CodeDeploy 애플리케이션 이름입니다.
+  AWS_CODEDEPLOY_DEPLOYMENT_GROUP_NAME: coura-codedeploy-group
