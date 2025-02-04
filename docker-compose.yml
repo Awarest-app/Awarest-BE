@@ -29,6 +29,8 @@ services:
   nest-app:
     container_name: nest-app
     image: '888577060888.dkr.ecr.us-east-1.amazonaws.com/server-repository:latest'
+    env_file:
+      - .env
     # build: .
     ports:
       - '${NEST_PORT}:3000'
