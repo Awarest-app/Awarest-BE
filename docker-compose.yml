@@ -33,8 +33,7 @@ services:
       - .env
     # build: .
     ports:
-      - '80:3000'
-      - '443:3000'
+      - '11582:3000'
     # - '${NEST_PORT}:3000'
     expose:
       - 3000
