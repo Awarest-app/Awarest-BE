@@ -28,13 +28,15 @@ services:
 
   nest-app:
     container_name: nest-app
-    build: .
+    image: '888577060888.dkr.ecr.us-east-1.amazonaws.com/server-repository:latest'
+    # build: .
     ports:
       - '${NEST_PORT}:3000'
     depends_on:
       - db
     networks:
       - nest-network
+    restart: always
 
 volumes:
   db-data:
