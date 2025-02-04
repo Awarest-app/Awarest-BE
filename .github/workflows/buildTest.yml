@@ -55,7 +55,8 @@ jobs:
           REPOSITORY: server-repository
           IMAGE_TAG: latest
         run: |
-          aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin $REGISTRY
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $REGISTRY
+
           # 2. NestJS Dockerfile이 위치한 디렉터리로 이동 (필요 시)
           #    예) 프로젝트 루트에 Dockerfile이 있다면 아래 cd 명령어 대신 'docker build -f ./Dockerfile .'
           # cd server
