@@ -49,6 +49,28 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      - name: Build and push image to Amazon ECR
+        env:
+          REGISTRY: 888577060888.dkr.ecr.us-east-1.amazonaws.com
+          REPOSITORY: server-repository
+          IMAGE_TAG: latest
+        run: |
+          aws ecr get-login-password --region ap-northeast-2 | docker login --username AWS --password-stdin $REGISTRY
+          # 2. NestJS Dockerfile이 위치한 디렉터리로 이동 (필요 시)
+          #    예) 프로젝트 루트에 Dockerfile이 있다면 아래 cd 명령어 대신 'docker build -f ./Dockerfile .'
+          # cd server
+
+          # 3. Docker Build
+          #    - Dockerfile에서 NestJS 앱을 빌드 & 실행하도록 작성해두어야 합니다.
+          #    - 예: dist 폴더를 COPY 해서 실행 (npm run build는 GitHub Actions 단계에서 이미 수행됨)
+          docker build -t $REPOSITORY:$IMAGE_TAG .
+
+          # 4. ECR에 push할 태그 생성
+          docker tag $REPOSITORY:$IMAGE_TAG $REGISTRY/$REPOSITORY:$IMAGE_TAG
+
+          # 5. Docker 이미지를 ECR에 푸시
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+
       # 위에서 만든 zip 파일을 S3에 업로드 합니다.
       - name: Upload to S3
         run: aws s3 cp --region ${{ secrets.AWS_REGION }} ./$GITHUB_SHA.zip s3://$S3_BUCKET_NAME/$PROJECT_NAME/$GITHUB_SHA.zip
