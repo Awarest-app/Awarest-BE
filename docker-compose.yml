@@ -35,6 +35,8 @@ services:
     # ports:
     # - '80:3000' # 외부 80 → 내부 3000 매핑
     # - '${NEST_PORT}:3000'
+    expose:
+      - 3000
     depends_on:
       - db
     networks:
