@@ -1,6 +1,11 @@
 // jwt.strategy.ts (기본 예시)
 import { UsersService } from '@/users/users.service';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PassportStrategy } from '@nestjs/passport';
@@ -39,26 +44,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  // validate 만 자동으로 호출
-  // validate 메서드에 request 추가
-  // jwt 로직을 탐 -> 무조건 DB에 정보가 있음 -> DB에 정보가 없다면 google oauth로 로그인
-  // async validate(req: Request, payload: any) {
-  //   const { userId, email } = payload;
-  //   const user = await this.usersService.findOne(userId);
-
-  //   if (!user) {
-  //     throw new UnauthorizedException('사용자를 찾을 수 없습니다.');
-  //   }
-
-  //   if (user.email !== email) {
-  //     throw new UnauthorizedException(
-  //       '토큰 이메일이 사용자 이메일과 일치하지 않습니다.',
-  //     );
-  //   }
-
-  //   return { userId: user.id, email: user.email, username: user.username };
-  // }
-
   async validate(req: Request, payload: any) {
     const now = Math.floor(Date.now() / 1000);
     // access token 만료 여부 체크
@@ -79,6 +64,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       }
       // refresh token이 없다면 에러 발생
       if (!refreshToken) {
+        // throw new HttpException(
+        //   'token expired. Please log in again.',
+        //   HttpStatus.UNAUTHORIZED,
+        // );
         throw new UnauthorizedException(
           'Access token expired, refresh token not provided.',
         );
@@ -107,7 +96,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         // 새 토큰을 요청 객체에 할당하여 인터셉터에서 응답 시 쿠키/헤더에 저장할 수 있도록 함
         (req as any).newToken = newToken;
       } catch (e) {
-        throw new UnauthorizedException('Refresh token invalid or expired.');
+        throw new UnauthorizedException('token expired. Please log in again.');
       }
     }
 
