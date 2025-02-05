@@ -8,6 +8,7 @@ import {
   Put,
   Delete,
   Req,
+  Query,
 } from '@nestjs/common';
 import { SubquestionService } from './subquestion.service';
 import { CreateSubquestionDto } from './dto/create-subquestion.dto';
@@ -20,6 +21,14 @@ import { Subquestion } from '@/entities/subquestion.entity';
 export class SubquestionController {
   constructor(private readonly subqService: SubquestionService) {}
 
+  // Question에 대한 subquestion 반환
+  @Get('admin/:id')
+  async getSubQuestion(@Param('id') id: number) {
+    const questionId = Number(id);
+    return await this.subqService.findSubquestion(questionId);
+  }
+
+  // mobile main에서 question, subquestion을 가져오는 부분
   @Get(':id')
   async findOne(@Req() request: jwtRequest, @Param('id') id: number) {
     // 여기서 queryid 는 questionId 입니다.
@@ -34,27 +43,14 @@ export class SubquestionController {
     return tes;
   }
 
-  // @Put('update/:id')
-  // async update(@Param('id') id: number, @Body() updateDto: string) {
-  //   // 여기서 id는 subquestionId
-  //   return this.subqService.update(id, updateDto);
-  // }
+  @Put('admin/update/:id')
+  async update(@Param('id') id: number, @Body() content: string) {
+    // 여기서 id는 subquestionId
+    return this.subqService.update(id, content);
+  }
 
   @Post()
   async create(@Body() createDto: CreateSubquestionDto) {
     return this.subqService.create(createDto);
   }
-
-  // @Put(':id')
-  // async update(
-  //   @Param('id') id: number,
-  //   @Body() updateDto: UpdateSubquestionDto,
-  // ) {
-  //   return this.subqService.update(id, updateDto);
-  // }
-
-  // @Delete(':id')
-  // async remove(@Param('id') id: number) {
-  //   return this.subqService.remove(id);
-  // }
 }

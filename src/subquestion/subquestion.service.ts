@@ -53,4 +53,17 @@ export class SubquestionService {
   async remove(id: number): Promise<void> {
     await this.subqRepo.delete(id);
   }
+
+  async findSubquestion(questionId: number): Promise<Partial<Subquestion>[]> {
+    return await this.subqRepo.find({
+      where: { questionId },
+      select: ['subquestionId', 'content'], // 필요한 필드만 선택
+    });
+  }
+
+  async update(id: number, updateDto: string): Promise<Subquestion> {
+    const subq = await this.subqRepo.findOne({ where: { subquestionId: id } });
+    subq.content = updateDto;
+    return this.subqRepo.save(subq);
+  }
 }
