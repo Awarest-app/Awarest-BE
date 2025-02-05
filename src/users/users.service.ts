@@ -39,8 +39,8 @@ export class UsersService {
     const newUser = this.usersRepository.create({
       email: data.email,
       username: data.username,
-      // isOauthUser: true,
       oauth_provider: data.oauthProvider,
+      role: 'user',
     });
 
     return this.usersRepository.save(newUser);
