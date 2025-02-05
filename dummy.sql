@@ -10,12 +10,12 @@ TRUNCATE TABLE users RESTART IDENTITY CASCADE;
 TRUNCATE TABLE level RESTART IDENTITY CASCADE;
 
 -- -- 2. users 테이블에 데이터 삽입
--- INSERT INTO users (username, email, age, country, password, is_oauth_user, oauth_provider, created_at) VALUES
--- ('유민규', 'dbalsrb0810@gmail.com', 25, 'USA', 'hashed_password_1', false, 'google', NOW());
+INSERT INTO users (username, email, age, country, password, oauth_provider, created_at, role) VALUES
+('admin_coura_account', 'admin@admin.com', 25, 'USA', 'admin', 'google', NOW(), 'admin');
 
 -- -- -- 추가 사용자 삽입 (필요 시)
--- INSERT INTO users (username, email, age, country, password, is_oauth_user, oauth_provider, created_at) VALUES
--- ('유민규2', 'test@gmail.com', 26, 'USA', 'hashed_password_2', false, NULL, NOW());
+-- INSERT INTO users (username, email, age, country, password, oauth_provider, created_at) VALUES
+-- ('유민규2', 'test@gmail.com', 26, 'USA', 'hashed_password_2', NULL, NOW());
 
 -- 3. questions 테이블에 데이터 삽입
 INSERT INTO questions (content, type, depth) VALUES
