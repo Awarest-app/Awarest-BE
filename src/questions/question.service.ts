@@ -484,4 +484,10 @@ export class QuestionService {
 
     return xpToAdd; // 트랜잭션 결과 반환
   }
+
+  getAllQuestions(): Promise<Partial<Question>[]> {
+    return this.questionRepo.find({
+      select: ['questionId', 'content', 'depth'],
+    });
+  }
 }

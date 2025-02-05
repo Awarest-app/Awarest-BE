@@ -33,8 +33,8 @@ export class User {
   @Column({ nullable: true })
   refresh_token: string; // 리프레시 토큰 저장
 
-  // @Column({ name: 'is_oauth_user', default: false })
-  // isOauthUser: boolean; // OAuth 사용자 여부
+  @Column({ nullable: true })
+  role: string; // 사용자 역할 (ex: 'user', 'admin')
 
   @Column({ nullable: true })
   oauth_provider: string; // OAuth 공급자 (ex: 'google')
