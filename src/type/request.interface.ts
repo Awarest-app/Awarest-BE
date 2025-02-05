@@ -1,4 +1,5 @@
 // 예: src/types/auth-request.interface.ts
+import { User } from '@/entities/user.entity';
 import { Request } from 'express';
 
 export interface AuthRequest extends Request {
