@@ -33,7 +33,7 @@ restart:
 local: local-db local-redis local-server 
 
 local-server:
-	@ENV_FILE=.local npm run start:dev
+	npm run start:dev 
 
 local-db:
 	@brew services start postgresql

@@ -59,4 +59,12 @@ export class QuestionController {
     console.log('xpToAdd', xpToAdd);
     return { success: true, xpAdded: xpToAdd };
   }
+
+  // @Public()
+  @Get('/admin/all')
+  async getAllQuestions() {
+    // console.log('request', request.cookies);
+    const questions = await this.questionService.getAllQuestions();
+    return questions;
+  }
 }
