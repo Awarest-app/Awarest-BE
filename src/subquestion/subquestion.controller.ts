@@ -44,13 +44,13 @@ export class SubquestionController {
   }
 
   @Put('admin/update/:id')
-  async update(@Param('id') id: number, @Body() content: string) {
-    // 여기서 id는 subquestionId
-    return this.subqService.update(id, content);
+  async update(@Param('id') id: number, @Body() body: { content: string }) {
+    console.log('subquestion.controller.ts: update', id, body.content);
+    return this.subqService.update(id, body.content);
   }
 
-  @Post()
-  async create(@Body() createDto: CreateSubquestionDto) {
-    return this.subqService.create(createDto);
+  @Post('admin/create')
+  async createAdmin(@Body() body: { questionId: number; content: string }) {
+    return this.subqService.create(body.questionId, body.content);
   }
 }

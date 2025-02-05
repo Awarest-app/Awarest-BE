@@ -5,7 +5,6 @@ import { Subquestion } from '@/entities/subquestion.entity';
 import { Repository } from 'typeorm';
 import { CreateSubquestionDto } from './dto/create-subquestion.dto';
 import { Question } from '@/entities/question.entity';
-// import { CreateSubquestionDto, UpdateSubquestionDto } from './dto';
 
 @Injectable()
 export class SubquestionService {
@@ -17,8 +16,13 @@ export class SubquestionService {
     private readonly questionRepo: Repository<Question>,
   ) {}
 
-  async create(createDto: CreateSubquestionDto): Promise<Subquestion> {
-    const subq = this.subqRepo.create(createDto);
+  async create(questionId: number, content: string): Promise<Subquestion> {
+    // 새로운 Subquestion 생성
+    const subq = this.subqRepo.create({
+      questionId,
+      content,
+    });
+
     return this.subqRepo.save(subq);
   }
 

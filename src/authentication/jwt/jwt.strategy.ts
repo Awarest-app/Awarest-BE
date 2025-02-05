@@ -81,6 +81,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         }
 
         // refresh token이 유효하면 새 access token을 발급 (예: 15분 유효)
+        console.log('새로운 access token 발급');
         const newToken = this.jwtService.sign(
           { userId: payload.userId, email: payload.email },
           {
