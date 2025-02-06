@@ -18,6 +18,7 @@ async function bootstrap() {
     // origin: '*', // 혹은 ['https://your-mobile-app-domain.com']
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
+    allowedHeaders: 'Content-Type, Accept, Authorization',
   });
   await app.listen(3000, () => {
     console.log('Nest app running on port 3000');
