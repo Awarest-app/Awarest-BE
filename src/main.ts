@@ -12,13 +12,7 @@ async function bootstrap() {
   app.useGlobalFilters(new UnauthorizedExceptionFilter());
 
   app.enableCors({
-    origin: [
-      'http://localhost:3000',
-      'http://localhost:8081',
-      'http://localhost:5173',
-      'https://awarest-admin.pages.dev',
-      'https://adminhi.getawarest.com/',
-    ], // React Native 앱의 도메인
+    origin: 'https://adminhi.getawarest.com', // React Native 앱의 도메인
     // origin: '*', // 혹은 ['https://your-mobile-app-domain.com']
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
