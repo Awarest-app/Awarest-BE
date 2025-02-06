@@ -177,14 +177,16 @@ export class AuthController {
     // 쿠키에 토큰 저장 (HttpOnly 설정으로 클라이언트 JS에서 접근 불가)
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // 프로덕션 환경에서는 HTTPS에서만 전송되도록 설정
+      // secure: process.env.NODE_ENV === 'production', // 프로덕션 환경에서는 HTTPS에서만 전송되도록 설정
+      secure: true, // 프로덕션 환경에서는 HTTPS에서만 전송되도록 설정
       sameSite: 'none',
       // maxAge: 15 * 60 * 1000, // 15분
     });
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      // secure: process.env.NODE_ENV === 'production',
+      secure: true,
       sameSite: 'none',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
     });
@@ -202,13 +204,15 @@ export class AuthController {
     // 클라이언트 쿠키 삭제 (빈 값과 만료 시간 설정)
     res.cookie('accessToken', '', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      // secure: process.env.NODE_ENV === 'production',
+      secure: true,
       sameSite: 'none',
       expires: new Date(0),
     });
     res.cookie('refreshToken', '', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      // secure: process.env.NODE_ENV === 'production',
+      secure: true,
       sameSite: 'none',
       expires: new Date(0),
     });

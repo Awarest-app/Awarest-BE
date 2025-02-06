@@ -12,6 +12,7 @@ async function bootstrap() {
     origin: [
       'https://adminhi.getawarest.com',
       'https://beapiserver.getawarest.com',
+      'https://*.getawarest.com',
     ], // React Native 앱의 도메인
     // origin: '*', // 혹은 ['https://your-mobile-app-domain.com']
     // methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
@@ -31,6 +32,12 @@ async function bootstrap() {
       'Skip-Auth',
     ],
   });
+
+  // app.set('trust proxy', 1);
+  // Express 애플리케이션으로 캐스팅하여 `set` 메서드 사용 가능하게 함
+  const expressApp = app.getHttpAdapter().getInstance();
+  expressApp.set('trust proxy', 1);
+
   app.use(cookieParser()); // 쿠키 파싱 미들웨어 추가
   app.useGlobalFilters(new UnauthorizedExceptionFilter());
   await app.listen(3000, () => {
