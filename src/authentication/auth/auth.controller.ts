@@ -178,14 +178,14 @@ export class AuthController {
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', // 프로덕션 환경에서는 HTTPS에서만 전송되도록 설정
-      sameSite: 'lax',
+      sameSite: 'none',
       // maxAge: 15 * 60 * 1000, // 15분
     });
 
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: 'none',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
     });
 
@@ -203,13 +203,13 @@ export class AuthController {
     res.cookie('accessToken', '', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: 'none',
       expires: new Date(0),
     });
     res.cookie('refreshToken', '', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: 'none',
       expires: new Date(0),
     });
 
