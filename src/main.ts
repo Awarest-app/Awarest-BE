@@ -8,9 +8,6 @@ async function bootstrap() {
     logger: ['log', 'error', 'warn', 'debug'], // 모든 로그 레벨 활성화
   });
 
-  app.use(cookieParser()); // 쿠키 파싱 미들웨어 추가
-  app.useGlobalFilters(new UnauthorizedExceptionFilter());
-
   app.enableCors({
     origin: 'https://adminhi.getawarest.com', // React Native 앱의 도메인
     // origin: '*', // 혹은 ['https://your-mobile-app-domain.com']
@@ -18,6 +15,8 @@ async function bootstrap() {
     credentials: true,
     allowedHeaders: 'Content-Type, Accept, Authorization, Skip-Auth',
   });
+  app.use(cookieParser()); // 쿠키 파싱 미들웨어 추가
+  app.useGlobalFilters(new UnauthorizedExceptionFilter());
   await app.listen(3000, () => {
     console.log('Nest app running on port 3000');
   });
