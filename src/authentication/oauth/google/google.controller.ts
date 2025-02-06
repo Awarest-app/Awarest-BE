@@ -57,7 +57,7 @@ export class GoogleController {
 
       // 클라이언트로 리다이렉트하면서 토큰 전달
       res.redirect(
-        `coura://login?accessToken=${accessToken}&refreshToken=${refreshToken}&survey=${survey.hasSurvey}`,
+        `awarest://login?accessToken=${accessToken}&refreshToken=${refreshToken}&survey=${survey.hasSurvey}`,
       );
     } catch (error) {
       console.error('OAuth 콜백 에러:', error);
