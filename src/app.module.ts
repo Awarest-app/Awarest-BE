@@ -1,5 +1,5 @@
 // src/app.module.ts
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
@@ -22,6 +22,7 @@ import { UserQuestionModule } from './userQuestion/userQuestion.module';
 import { RedisModule } from './redis/redis.module';
 import { ProfileModule } from './profile/profile.module';
 import { TokenRefreshInterceptor } from './authentication/jwt/token-refresh.interceptor';
+import { LoggerMiddleware } from './middleware/logger.middleware';
 
 @Module({
   imports: [
@@ -74,4 +75,9 @@ import { TokenRefreshInterceptor } from './authentication/jwt/token-refresh.inte
   ],
   exports: [JwtModule, PassportModule],
 })
-export class AppModule {}
+// export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('*'); // 모든 경로에 적용
+  }
+}

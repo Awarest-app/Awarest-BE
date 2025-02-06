@@ -147,6 +147,7 @@ export class AuthController {
     const { email, password } = loginData;
     // 이메일로 사용자 찾기
     const user = await this.usersService.findByEmail(email);
+    console.log('user');
 
     // 사용자 존재 여부와 role 체크
     if (!user || user.role !== 'admin') {
