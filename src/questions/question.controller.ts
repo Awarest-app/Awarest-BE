@@ -1,5 +1,5 @@
 // question.controller.ts
-import { Controller, Get, Post, Body, Req } from '@nestjs/common';
+import { Controller, Get, Post, Body, Req, Put } from '@nestjs/common';
 import { QuestionService } from './question.service';
 import { jwtRequest } from '@/type/request.interface';
 
@@ -66,5 +66,11 @@ export class QuestionController {
     // console.log('request', request.cookies);
     const questions = await this.questionService.getAllQuestions();
     return questions;
+  }
+
+  @Put('/admin/update')
+  async updateQuestion(@Body() body: { questionId: number; content: string }) {
+    await this.questionService.updateQuestion(body.questionId, body.content);
+    return { success: true };
   }
 }

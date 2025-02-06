@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, In, Repository } from 'typeorm';
 import { Question } from '@/entities/question.entity';
@@ -488,6 +492,26 @@ export class QuestionService {
   getAllQuestions(): Promise<Partial<Question>[]> {
     return this.questionRepo.find({
       select: ['questionId', 'content', 'depth'],
+      order: { questionId: 'ASC' },
     });
+  }
+
+  async updateQuestion(
+    questionId: number,
+    content: string,
+  ): Promise<Partial<Question> | null> {
+    // 1️⃣ 먼저 해당 questionId가 존재하는지 확인
+    console.log('prev updateQuestion', questionId, content);
+    const question = await this.questionRepo.findOne({ where: { questionId } });
+    console.log('question', question);
+    if (!question) {
+      throw new NotFoundException('해당 questionId를 찾을 수 없습니다.');
+    }
+
+    // 2️⃣ content 업데이트 실행
+    console.log('updateQuestion', questionId, content);
+    await this.questionRepo.update({ questionId }, { content });
+
+    return { questionId, content };
   }
 }

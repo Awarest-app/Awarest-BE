@@ -15,6 +15,7 @@ import { CreateSubquestionDto } from './dto/create-subquestion.dto';
 import { UpdateSubquestionDto } from './dto/update-subquestion.dto';
 import { jwtRequest } from '@/type/request.interface';
 import { Subquestion } from '@/entities/subquestion.entity';
+import { IQuestionProps } from '@/questions/dto/question.dto';
 // import { CreateSubquestionDto, UpdateSubquestionDto } from './dto';
 
 @Controller('api/subquestions')
@@ -49,8 +50,20 @@ export class SubquestionController {
     return this.subqService.update(id, body.content);
   }
 
-  @Post('admin/create')
-  async createAdmin(@Body() body: { questionId: number; content: string }) {
+  // 새로운 질문 생성하는 부분 TODO
+  @Post('/admin/create')
+  async createNewQuestion(@Body() body: { content: IQuestionProps }) {
+    const { question_content, subquestion } = body.content;
+
+    const savedQuestion = await this.subqService.createQuestion(
+      question_content,
+      subquestion,
+    );
+    return { success: true, questionId: savedQuestion.questionId };
+  }
+
+  @Post('/admin/create/subquestion')
+  async create(@Body() body: { questionId: number; content: string }) {
     return this.subqService.create(body.questionId, body.content);
   }
 }
