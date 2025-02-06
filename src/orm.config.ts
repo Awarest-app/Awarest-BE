@@ -31,6 +31,12 @@ function ormConfig(): TypeOrmModuleOptions {
     migrationsRun: commonConf.MIGRATIONS_RUN,
     //sql log
     logging: false,
+    extra: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false, // RDS의 경우 자체 서명 인증서를 사용하므로 false로 설정
+      },
+    },
   };
 }
 
