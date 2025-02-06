@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
 import { UnauthorizedExceptionFilter } from './authentication/jwt/unauthorized-exception.filter';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -19,6 +20,7 @@ async function bootstrap() {
     credentials: true,
     // allowedHeaders: 'Content-Type, Accept, Authorization, Skip-Auth',
     allowedHeaders: [
+      'Origin',
       'Authorization',
       'Accept',
       'Content-Type',
@@ -31,6 +33,14 @@ async function bootstrap() {
       'Skip-Auth',
     ],
   });
+
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
   // app.set('trust proxy', 1);
   // Express 애플리케이션으로 캐스팅하여 `set` 메서드 사용 가능하게 함
