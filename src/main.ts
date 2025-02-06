@@ -13,6 +13,7 @@ async function bootstrap() {
       'http://localhost:3000',
       'http://localhost:8081',
       'http://localhost:5173',
+      'https://awarest-admin.pages.dev',
     ], // React Native 앱의 도메인
     // origin: '*', // 혹은 ['https://your-mobile-app-domain.com']
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
