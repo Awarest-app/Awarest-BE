@@ -9,11 +9,27 @@ async function bootstrap() {
   });
 
   app.enableCors({
-    origin: 'https://adminhi.getawarest.com', // React Native 앱의 도메인
+    origin: [
+      'https://adminhi.getawarest.com',
+      'https://beapiserver.getawarest.com',
+    ], // React Native 앱의 도메인
     // origin: '*', // 혹은 ['https://your-mobile-app-domain.com']
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    // methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH', 'HEAD'],
     credentials: true,
-    allowedHeaders: 'Content-Type, Accept, Authorization, Skip-Auth',
+    // allowedHeaders: 'Content-Type, Accept, Authorization, Skip-Auth',
+    allowedHeaders: [
+      'Authorization',
+      'Accept',
+      'Content-Type',
+      'Authorization',
+      'X-Requested-With',
+      'X-HTTP-Method-Override',
+      'X-Forwarded-Proto',
+      'X-Forwarded-For',
+      'X-Forwarded-Port',
+      'Skip-Auth',
+    ],
   });
   app.use(cookieParser()); // 쿠키 파싱 미들웨어 추가
   app.useGlobalFilters(new UnauthorizedExceptionFilter());
