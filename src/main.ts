@@ -12,7 +12,6 @@ async function bootstrap() {
     origin: [
       'https://adminhi.getawarest.com',
       'https://beapiserver.getawarest.com',
-      'https://*.getawarest.com',
     ], // React Native 앱의 도메인
     // origin: '*', // 혹은 ['https://your-mobile-app-domain.com']
     // methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
