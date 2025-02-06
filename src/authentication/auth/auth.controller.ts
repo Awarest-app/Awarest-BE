@@ -178,7 +178,7 @@ export class AuthController {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production', // 프로덕션 환경에서는 HTTPS에서만 전송되도록 설정
       sameSite: 'lax',
-      maxAge: 15 * 60 * 1000, // 15분
+      // maxAge: 15 * 60 * 1000, // 15분
     });
 
     res.cookie('refreshToken', refreshToken, {

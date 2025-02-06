@@ -1,11 +1,6 @@
 // jwt.strategy.ts (기본 예시)
 import { UsersService } from '@/users/users.service';
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { PassportStrategy } from '@nestjs/passport';
@@ -86,16 +81,17 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         }
 
         // refresh token이 유효하면 새 access token을 발급 (예: 15분 유효)
+        console.log('새로운 access token 발급');
         const newToken = this.jwtService.sign(
           { userId: payload.userId, email: payload.email },
           {
             secret: this.configService.get<string>('JWT_SECRET'),
-            expiresIn: '1m',
+            expiresIn: '15m',
           },
         );
         // 새 토큰을 요청 객체에 할당하여 인터셉터에서 응답 시 쿠키/헤더에 저장할 수 있도록 함
         (req as any).newToken = newToken;
-      } catch (e) {
+      } catch {
         throw new UnauthorizedException('token expired. Please log in again.');
       }
     }

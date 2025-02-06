@@ -8,18 +8,28 @@ import {
   Put,
   Delete,
   Req,
+  Query,
 } from '@nestjs/common';
 import { SubquestionService } from './subquestion.service';
 import { CreateSubquestionDto } from './dto/create-subquestion.dto';
 import { UpdateSubquestionDto } from './dto/update-subquestion.dto';
 import { jwtRequest } from '@/type/request.interface';
 import { Subquestion } from '@/entities/subquestion.entity';
+import { IQuestionProps } from '@/questions/dto/question.dto';
 // import { CreateSubquestionDto, UpdateSubquestionDto } from './dto';
 
 @Controller('api/subquestions')
 export class SubquestionController {
   constructor(private readonly subqService: SubquestionService) {}
 
+  // Question에 대한 subquestion 반환
+  @Get('admin/:id')
+  async getSubQuestion(@Param('id') id: number) {
+    const questionId = Number(id);
+    return await this.subqService.findSubquestion(questionId);
+  }
+
+  // mobile main에서 question, subquestion을 가져오는 부분
   @Get(':id')
   async findOne(@Req() request: jwtRequest, @Param('id') id: number) {
     // 여기서 queryid 는 questionId 입니다.
@@ -34,27 +44,26 @@ export class SubquestionController {
     return tes;
   }
 
-  // @Put('update/:id')
-  // async update(@Param('id') id: number, @Body() updateDto: string) {
-  //   // 여기서 id는 subquestionId
-  //   return this.subqService.update(id, updateDto);
-  // }
-
-  @Post()
-  async create(@Body() createDto: CreateSubquestionDto) {
-    return this.subqService.create(createDto);
+  @Put('admin/update/:id')
+  async update(@Param('id') id: number, @Body() body: { content: string }) {
+    console.log('subquestion.controller.ts: update', id, body.content);
+    return this.subqService.update(id, body.content);
   }
 
-  // @Put(':id')
-  // async update(
-  //   @Param('id') id: number,
-  //   @Body() updateDto: UpdateSubquestionDto,
-  // ) {
-  //   return this.subqService.update(id, updateDto);
-  // }
+  // 새로운 질문 생성하는 부분 TODO
+  @Post('/admin/create')
+  async createNewQuestion(@Body() body: { content: IQuestionProps }) {
+    const { question_content, subquestion } = body.content;
 
-  // @Delete(':id')
-  // async remove(@Param('id') id: number) {
-  //   return this.subqService.remove(id);
-  // }
+    const savedQuestion = await this.subqService.createQuestion(
+      question_content,
+      subquestion,
+    );
+    return { success: true, questionId: savedQuestion.questionId };
+  }
+
+  @Post('/admin/create/subquestion')
+  async create(@Body() body: { questionId: number; content: string }) {
+    return this.subqService.create(body.questionId, body.content);
+  }
 }
