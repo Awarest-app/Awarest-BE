@@ -31,11 +31,9 @@ function ormConfig(): TypeOrmModuleOptions {
     migrationsRun: commonConf.MIGRATIONS_RUN,
     //sql log
     logging: false,
-    extra: {
-      ssl: {
-        require: true,
-        rejectUnauthorized: false, // RDS의 경우 자체 서명 인증서를 사용하므로 false로 설정
-      },
+
+    ssl: {
+      rejectUnauthorized: false, // AWS RDS의 자체 서명된 인증서 검증을 건너뛰기 위해 false로 설정 (프로덕션에서는 CA 인증서를 사용하는 것이 좋습니다)
     },
   };
 }
