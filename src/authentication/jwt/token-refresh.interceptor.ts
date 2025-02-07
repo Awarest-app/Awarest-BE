@@ -1,32 +1,3 @@
-// // src/common/interceptors/token-refresh.interceptor.ts
-
-// import {
-//   Injectable,
-//   NestInterceptor,
-//   ExecutionContext,
-//   CallHandler,
-// } from '@nestjs/common';
-// import { Observable } from 'rxjs';
-// import { tap } from 'rxjs/operators';
-// import { Request, Response } from 'express';
-
-// @Injectable()
-// export class TokenRefreshInterceptor implements NestInterceptor {
-//   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-//     const ctx = context.switchToHttp();
-//     const request = ctx.getRequest<Request>();
-//     const response = ctx.getResponse<Response>();
-
-//     return next.handle().pipe(
-//       tap((data) => {
-//         if ((request as any).newToken) {
-//           response.setHeader('x-refresh-token', (request as any).newToken);
-//         }
-//       }),
-//     );
-//   }
-// }
-
 // src/common/interceptors/token-refresh.interceptor.ts
 import {
   Injectable,
@@ -51,6 +22,7 @@ export class TokenRefreshInterceptor implements NestInterceptor {
         if (newToken) {
           // 헤더에 새로운 토큰 추가 (선택적)
           response.setHeader('x-refresh-token', newToken);
+
           // 웹 환경: 쿠키에도 저장
           response.cookie('accessToken', newToken, {
             httpOnly: true, // 클라이언트 JS에서 접근 불가

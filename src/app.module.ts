@@ -27,6 +27,7 @@ import { TokenRefreshInterceptor } from './authentication/jwt/token-refresh.inte
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: `../config/.env.${process.env.NODE_ENV || 'development'}`, // NODE_ENV에 따라 다른 .env 파일 사용
       // envFilePath: process.env.ENV_FILE,
     }), // .env 파일 전역 로드
     JwtModule.registerAsync({
