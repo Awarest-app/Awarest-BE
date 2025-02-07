@@ -5,8 +5,8 @@ name: Deploy NestJS Application
 on:
   push:
     branches: [main]
-  pull_request:
-    branches: [main]
+  # pull_request:
+  #   branches: [main]
 
   workflow_dispatch:
 
@@ -64,7 +64,10 @@ jobs:
           # 3. Docker Build
           #    - Dockerfile에서 NestJS 앱을 빌드 & 실행하도록 작성해두어야 합니다.
           #    - 예: dist 폴더를 COPY 해서 실행 (npm run build는 GitHub Actions 단계에서 이미 수행됨)
-          docker build -t $REPOSITORY:$IMAGE_TAG .
+          # docker build -t $REPOSITORY:$IMAGE_TAG .
+
+          # Dockerfile이 /docker 폴더 내에 있으므로 -f 옵션으로 경로를 지정합니다.
+          docker build -f docker/Dockerfile.dev -t $REPOSITORY:$IMAGE_TAG .
 
           # 4. ECR에 push할 태그 생성
           docker tag $REPOSITORY:$IMAGE_TAG $REGISTRY/$REPOSITORY:$IMAGE_TAG
