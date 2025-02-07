@@ -3,7 +3,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Subquestion } from '@/entities/subquestion.entity';
 import { Repository } from 'typeorm';
-import { CreateSubquestionDto } from './dto/create-subquestion.dto';
 import { Question } from '@/entities/question.entity';
 
 @Injectable()

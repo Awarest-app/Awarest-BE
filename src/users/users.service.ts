@@ -50,6 +50,7 @@ export class UsersService {
   async getUserAnswers(userId: number): Promise<Answer[]> {
     // 사용자 존재 확인
     const user = await this.findOne(userId);
+    console.log('user', user);
 
     // 해당 사용자의 답변 조회
     return this.answerRepository.find({
