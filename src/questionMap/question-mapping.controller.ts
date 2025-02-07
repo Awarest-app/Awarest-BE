@@ -13,12 +13,12 @@ import { QuestionMappingService } from './question-mapping.service';
 import { CreateQuestionMappingDto } from './dto/create-question-mapping.dto';
 import { UpdateQuestionMappingDto } from './dto/update-question-mapping.dto';
 
-@Controller('question-mappings')
+@Controller('api/question-mappings')
 export class QuestionMappingController {
   constructor(private readonly qmService: QuestionMappingService) {}
 
   // 설문 매핑 생성 엔드포인트
-  @Post()
+  @Post('admin')
   async create(@Body() createDto: CreateQuestionMappingDto) {
     return this.qmService.create(createDto);
   }
@@ -30,13 +30,13 @@ export class QuestionMappingController {
   }
 
   // 특정 ID의 설문 매핑 조회 엔드포인트
-  @Get(':id')
+  @Get('admin/:id')
   async findOne(@Param('id') id: number) {
-    return this.qmService.findOne(id);
+    return this.qmService.findByQuestion(id);
   }
 
   // 설문 매핑 업데이트 엔드포인트
-  @Put(':id')
+  @Put('admin/:id')
   async update(
     @Param('id') id: number,
     @Body() updateDto: UpdateQuestionMappingDto,

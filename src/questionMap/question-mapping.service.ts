@@ -29,6 +29,10 @@ export class QuestionMappingService {
     return this.qmRepo.findOne({ where: { id } });
   }
 
+  async findByQuestion(questionId: number): Promise<QuestionMapping[]> {
+    return this.qmRepo.find({ where: { questionId } });
+  }
+
   // 설문 매핑 업데이트
   async update(
     id: number,
