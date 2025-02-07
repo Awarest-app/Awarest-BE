@@ -1,4 +1,4 @@
-import { Controller, Get, Header, Req } from '@nestjs/common';
+import { Controller, Get, Header, Req, Res } from '@nestjs/common';
 
 import { Public } from './authentication/jwt/public.decorator';
 
@@ -18,7 +18,7 @@ export class AppController {
   }
 
   @Get('test/jwt')
-  testOauthConnection(@Req() request: any) {
+  testOauthConnection(@Res() res: any) {
     // console.log('request.user', request);
     // return { message: 'NestJS 서버와 연결 성공!' };
     return res.status(200).json({ message: 'update sceess' });
