@@ -29,12 +29,16 @@ function ormConfig(): TypeOrmModuleOptions {
     entities: commonConf.ENTITIES,
     migrations: commonConf.MIGRATIONS,
     migrationsRun: commonConf.MIGRATIONS_RUN,
+
     //sql log
     logging: false,
 
-    ssl: {
-      rejectUnauthorized: false, // AWS RDS의 자체 서명된 인증서 검증을 건너뛰기 위해 false로 설정 (프로덕션에서는 CA 인증서를 사용하는 것이 좋습니다)
-    },
+    ...(process.env.NODE_ENV === 'production' && {
+      ssl: { rejectUnauthorized: false },
+    }),
+    // ssl: {
+    //   rejectUnauthorized: false, // AWS RDS의 자체 서명된 인증서 검증을 건너뛰기 위해 false로 설정 (프로덕션에서는 CA 인증서를 사용하는 것이 좋습니다)
+    // },
   };
 }
 

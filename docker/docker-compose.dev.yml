@@ -1,6 +1,8 @@
 version: '3'
 services:
   db:
+    env_file:
+      - ../config/.env.development
     image: postgres:14
     container_name: coura-db
     environment:
@@ -28,15 +30,17 @@ services:
 
   nest-app:
     container_name: nest-app
-    image: '888577060888.dkr.ecr.us-east-1.amazonaws.com/server-repository:latest'
-    env_file:
-      - .env
     # build: .
+    build:
+      context: ../ # 프로젝트 루트가 빌드 컨텍스트
+      dockerfile: docker/Dockerfile.dev # 빌드 컨텍스트(프로젝트 루트) 내에서 Dockerfile의 경로 지정
+    env_file:
+      - ../config/.env.development
     ports:
-      - '11582:3000'
-      # - '80:3000'
-      # - '443:3000'
-    # - '${NEST_PORT}:3000'
+      - '${NEST_PORT}:3000'
+        # - '11582:3000'
+        # - '80:3000'
+        # - '443:3000'
     expose:
       - 3000
     depends_on:

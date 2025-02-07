@@ -29,7 +29,7 @@ import { LoggerMiddleware } from './middleware/logger.middleware';
     ConfigModule.forRoot({
       isGlobal: true,
       // envFilePath: './config/.env',
-      // envFilePath: `./config/.env.${process.env.NODE_ENV || 'development'}`, // NODE_ENV에 따라 다른 .env 파일 사용
+      envFilePath: `../config/.env.${process.env.NODE_ENV || 'development'}`, // NODE_ENV에 따라 다른 .env 파일 사용
     }), // .env 파일 전역 로드
     JwtModule.registerAsync({
       imports: [ConfigModule],

@@ -2,7 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
 import { UnauthorizedExceptionFilter } from './authentication/jwt/unauthorized-exception.filter';
-import { ValidationPipe } from '@nestjs/common';
+// import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -19,7 +19,6 @@ async function bootstrap() {
     // methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH', 'HEAD'],
     credentials: true,
-    // allowedHeaders: 'Content-Type, Accept, Authorization, Skip-Auth',
     allowedHeaders: [
       'Origin',
       'Authorization',
