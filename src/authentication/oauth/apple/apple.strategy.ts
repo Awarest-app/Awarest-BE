@@ -6,6 +6,7 @@ import { Strategy, VerifyCallback } from 'passport-apple';
 @Injectable()
 export class AppleStrategy extends PassportStrategy(Strategy, 'apple') {
   constructor() {
+    console.log('AppleStrategy');
     super({
       // Apple Developer Portal에서 발급받은 값들
       clientID: process.env.APPLE_CLIENT_ID, // 서비스 ID (클라이언트 ID)

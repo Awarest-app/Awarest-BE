@@ -8,6 +8,9 @@ import { AuthModule } from '@/auth/auth.module';
 import { SurveyModule } from '@/survey/survey.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from '../jwt/jwt.strategy';
+import { AppleController } from './apple/apple.controller';
+import { AppleStrategy } from './apple/apple.strategy';
+import { AppleService } from './apple/apple.service';
 
 @Module({
   imports: [
@@ -16,7 +19,13 @@ import { JwtStrategy } from '../jwt/jwt.strategy';
     SurveyModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
   ],
-  controllers: [GoogleController],
-  providers: [GoogleService, GoogleStrategy, JwtStrategy],
+  controllers: [GoogleController, AppleController],
+  providers: [
+    GoogleService,
+    GoogleStrategy,
+    JwtStrategy,
+    AppleStrategy,
+    AppleService,
+  ],
 })
 export class OauthModule {}
