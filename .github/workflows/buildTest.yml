@@ -67,7 +67,7 @@ jobs:
           # docker build -t $REPOSITORY:$IMAGE_TAG .
 
           # Dockerfile이 /docker 폴더 내에 있으므로 -f 옵션으로 경로를 지정합니다.
-          docker build -f docker/Dockerfile.dev -t $REPOSITORY:$IMAGE_TAG .
+          docker build -f docker/Dockerfile.aws -t $REPOSITORY:$IMAGE_TAG .
 
           # 4. ECR에 push할 태그 생성
           docker tag $REPOSITORY:$IMAGE_TAG $REGISTRY/$REPOSITORY:$IMAGE_TAG
