@@ -28,7 +28,8 @@ import { LoggerMiddleware } from './middleware/logger.middleware';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      // envFilePath: process.env.ENV_FILE,
+      // envFilePath: './config/.env',
+      // envFilePath: `./config/.env.${process.env.NODE_ENV || 'development'}`, // NODE_ENV에 따라 다른 .env 파일 사용
     }), // .env 파일 전역 로드
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -39,11 +40,6 @@ import { LoggerMiddleware } from './middleware/logger.middleware';
       }),
       global: true, // JwtModule을 전역으로 설정
     }),
-    // JwtModule.register({
-    //   secret: process.env.JWT_SECRET, // -> app에서 안하면 env가 안먹힘
-    //   global: true,
-    //   signOptions: { expiresIn: '15m' }, // 토큰 만료 시간 등 -> TODO
-    // }),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     TypeOrmModule.forRootAsync({ useFactory: ormConfig }),
     RedisModule,

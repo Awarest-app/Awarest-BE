@@ -13,6 +13,7 @@ async function bootstrap() {
     origin: [
       'https://adminhi.getawarest.com',
       'https://beapiserver.getawarest.com',
+      'awaerst://',
     ], // React Native 앱의 도메인
     // origin: '*', // 혹은 ['https://your-mobile-app-domain.com']
     // methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
@@ -34,13 +35,13 @@ async function bootstrap() {
     ],
   });
 
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-    }),
-  );
+  // app.useGlobalPipes(
+  //   new ValidationPipe({
+  //     whitelist: true,
+  //     forbidNonWhitelisted: true,
+  //     transform: true,
+  //   }),
+  // );
 
   // app.set('trust proxy', 1);
   // Express 애플리케이션으로 캐스팅하여 `set` 메서드 사용 가능하게 함
