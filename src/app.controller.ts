@@ -19,9 +19,10 @@ export class AppController {
 
   @Get('test/jwt')
   testOauthConnection(@Req() request: any) {
-    console.log('request.user', request);
+    // console.log('request.user', request);
     return { message: 'NestJS 서버와 연결 성공!' };
   }
+
   @Public()
   @Get('test-cors')
   @Header('Access-Control-Allow-Origin', 'https://adminhi.getawarest.com')

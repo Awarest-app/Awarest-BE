@@ -7,7 +7,7 @@ import { UnauthorizedExceptionFilter } from './authentication/jwt/unauthorized-e
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    logger: ['log', 'error', 'warn', 'debug'], // 모든 로그 레벨 활성화
+    logger: ['log', 'error'], // 모든 로그 레벨 활성화
   });
 
   app.enableCors({

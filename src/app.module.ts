@@ -23,12 +23,19 @@ import { RedisModule } from './redis/redis.module';
 import { ProfileModule } from './profile/profile.module';
 import { TokenRefreshInterceptor } from './authentication/jwt/token-refresh.interceptor';
 import { FirebaseService } from './utils/firebase/firebase.service';
+import * as path from 'path';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: `../config/.env.${process.env.NODE_ENV || 'development'}`, // NODE_ENV에 따라 다른 .env 파일 사용
+      // envFilePath: `../config/.env.${process.env.NODE_ENV || 'development'}`, // NODE_ENV에 따라 다른 .env 파일 사용
+      envFilePath: path.resolve(
+        process.cwd(),
+        'config',
+        `.env.${process.env.NODE_ENV || 'development'}`,
+      ),
+
       // envFilePath: process.env.ENV_FILE,
     }), // .env 파일 전역 로드
     JwtModule.registerAsync({
