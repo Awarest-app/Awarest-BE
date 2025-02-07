@@ -1,0 +1,53 @@
+version: '3'
+services:
+  db:
+    env_file: ../config/.env.production
+    image: postgres:14
+    container_name: coura-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - '5433:5432'
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - nest-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - '6379:6379'
+    # 필요하면 volume, 환경 변수, 비밀번호 설정 등 추가 가능
+    # environment:
+    #   REDIS_PASSWORD: example
+    # command: ["redis-server", "--requirepass", "example"]
+    networks:
+      - nest-network
+
+  nest-app:
+    container_name: nest-app
+    image: '888577060888.dkr.ecr.us-east-1.amazonaws.com/server-repository:latest'
+    env_file:
+      - ../config/.env.production
+    # build: .
+    ports:
+      - '11582:3000'
+      # - '80:3000'
+      # - '443:3000'
+    # - '${NEST_PORT}:3000'
+    expose:
+      - 3000
+    depends_on:
+      - db
+    networks:
+      - nest-network
+    restart: always
+
+volumes:
+  db-data:
+
+networks:
+  nest-network:

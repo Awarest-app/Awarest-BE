@@ -13,10 +13,12 @@
 # mkdir -p /home/ec2-user/deploy/zip
 # cd /home/ec2-user/deploy/zip/
 
-docker-compose down
+#!/bin/sh
+
+docker-compose -f /home/ec2-user/my-nest-app/docker/docker-compose.yml down
 
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 888577060888.dkr.ecr.us-east-1.amazonaws.com
 
-docker-compose pull
+docker-compose -f /home/ec2-user/my-nest-app/docker/docker-compose.yml pull
 
-docker-compose up -d
+docker-compose -f /home/ec2-user/my-nest-app/docker/docker-compose.yml up -d
