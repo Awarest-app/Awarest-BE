@@ -20,7 +20,8 @@ export class AppController {
   @Get('test/jwt')
   testOauthConnection(@Req() request: any) {
     // console.log('request.user', request);
-    return { message: 'NestJS 서버와 연결 성공!' };
+    // return { message: 'NestJS 서버와 연결 성공!' };
+    return res.status(200).json({ message: 'update sceess' });
   }
 
   @Public()
