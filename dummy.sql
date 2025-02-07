@@ -99,30 +99,7 @@ INSERT INTO subquestion (question_id, content, "order") VALUES
 -- (6, 1),
 -- (10, 1);
 
--- -- 7. profile 테이블에 데이터 삽입 (수정된 컬럼 이름과 데이터 타입 사용)
--- INSERT INTO profile (
---   user_id, 
---   day_streak, 
---   last_streak_date, 
---   total_xp, 
---   level, 
---   total_answers, 
---   achievements, 
---   subscription, 
---   joined_date, 
---   noti
--- ) VALUES
--- (1, -- user_id (FK to users.id)
---   5, -- day_streak: 5일 연속
---   '2025-01-20', -- last_streak_date: 최근 스트릭 날짜
---   1500, -- total_xp: 총 경험치
---   3, -- level: 레벨
---   10, -- total_answers: 총 답변 수
---   2, -- achievements: 업적 수
---   'Premium', -- subscription: 구독 상태
---   '2025-01-01', -- joined_date: 가입 날짜
---   true -- noti: 알림 (boolean 값)
--- );
+
 
 INSERT INTO level (level, required_xp) VALUES
 (1, 50),
