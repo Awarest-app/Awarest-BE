@@ -94,7 +94,8 @@ export class AuthController {
 
       // return { message: '성공적으로 로그아웃되었습니다.' };
       // res.redirected('https://accounts.google.com/logout');
-      return res.redirect('https://accounts.google.com/logout');
+      // return res.redirect('https://accounts.google.com/logout');
+      return res.status(200).json({ message: 'update sceess' });
     } catch (error) {
       throw new HttpException(
         '유효하지 않거나 만료된 리프레시 토큰입니다.',

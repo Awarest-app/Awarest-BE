@@ -35,7 +35,7 @@ restart:
 local: local-db local-redis local-server 
 
 local-server:
-	npm run start:dev 
+	DB_HOST=localhost REDIS_HOST=localhost npm run start:dev
 
 local-db:
 	@brew services start postgresql
@@ -50,16 +50,5 @@ local-redis:
 sql: local-db
 	@echo "Executing SQL script: $(SQL_FILE)"
 	@psql -U postgres -d coura -f $(SQL_FILE)
-# @psql -U postgres -d $(DB_NAME) -f $(SQL_FILE)
-
-# local-down:
-# 	@brew services stop postgresql
-# 	@brew services stop redis
-
-# create-db:
-# 	psql -U postgres -c "CREATE DATABASE coura;"
-
-# drop-db:
-# 	psql -U postgres -c "DROP DATABASE IF EXISTS coura;"
 
 .PHONY: all up down down-volumes build restart sql

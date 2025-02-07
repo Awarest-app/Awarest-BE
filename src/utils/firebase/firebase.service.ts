@@ -7,7 +7,7 @@ export class FirebaseService implements OnModuleInit {
   onModuleInit() {
     if (!admin.apps.length) {
       const serviceAccount = JSON.parse(
-        fs.readFileSync('..//config/firebase-adminsdk.json', 'utf8'),
+        fs.readFileSync('../../../config/firebase-adminsdk.json', 'utf8'),
       );
 
       admin.initializeApp({

@@ -22,7 +22,8 @@
       "@/*": ["./src/*"],
       "@/auth/*": ["./src/authentication/auth/*"],
       "@/oauth/*": ["./src/authentication/oauth/*"],
-      "@/users/*": ["./src/users/*"]
+      "@/users/*": ["./src/users/*"],
+      "@/config/*": ["./config/*"]
     }
   },
   "exclude": ["node_modules", "test"]

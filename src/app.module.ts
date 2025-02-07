@@ -22,6 +22,7 @@ import { UserQuestionModule } from './userQuestion/userQuestion.module';
 import { RedisModule } from './redis/redis.module';
 import { ProfileModule } from './profile/profile.module';
 import { TokenRefreshInterceptor } from './authentication/jwt/token-refresh.interceptor';
+import { FirebaseService } from './utils/firebase/firebase.service';
 
 @Module({
   imports: [
@@ -39,11 +40,6 @@ import { TokenRefreshInterceptor } from './authentication/jwt/token-refresh.inte
       }),
       global: true, // JwtModule을 전역으로 설정
     }),
-    // JwtModule.register({
-    //   secret: process.env.JWT_SECRET, // -> app에서 안하면 env가 안먹힘
-    //   global: true,
-    //   signOptions: { expiresIn: '15m' }, // 토큰 만료 시간 등 -> TODO
-    // }),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     TypeOrmModule.forRootAsync({ useFactory: ormConfig }),
     RedisModule,
@@ -72,6 +68,7 @@ import { TokenRefreshInterceptor } from './authentication/jwt/token-refresh.inte
     },
     // meta data를 위한 reflector -> @public 처리
     Reflector,
+    // FirebaseService,
   ],
   exports: [JwtModule, PassportModule],
 })
