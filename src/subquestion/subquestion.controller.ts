@@ -1,20 +1,7 @@
 // src/subquestion/subquestion.controller.ts
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Param,
-  Put,
-  Delete,
-  Req,
-  Query,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Req } from '@nestjs/common';
 import { SubquestionService } from './subquestion.service';
-import { CreateSubquestionDto } from './dto/create-subquestion.dto';
-import { UpdateSubquestionDto } from './dto/update-subquestion.dto';
 import { jwtRequest } from '@/type/request.interface';
-import { Subquestion } from '@/entities/subquestion.entity';
 import { IQuestionProps } from '@/questions/dto/question.dto';
 // import { CreateSubquestionDto, UpdateSubquestionDto } from './dto';
 
