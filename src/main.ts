@@ -29,7 +29,7 @@ async function bootstrap() {
       'X-Forwarded-Proto',
       'X-Forwarded-For',
       'X-Forwarded-Port',
-      'Skip-Auth',
+      // 'Skip-Auth',
       'x-refresh-token',
       'x-access-token',
     ],
@@ -49,7 +49,7 @@ async function bootstrap() {
   expressApp.set('trust proxy', 1);
 
   app.use(cookieParser()); // 쿠키 파싱 미들웨어 추가
-  app.useGlobalFilters(new UnauthorizedExceptionFilter());
+  // app.useGlobalFilters(new UnauthorizedExceptionFilter());
   await app.listen(3000, () => {
     console.log('Nest app running on port 3000');
   });
