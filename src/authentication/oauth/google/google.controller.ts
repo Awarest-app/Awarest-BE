@@ -50,9 +50,9 @@ export class GoogleController {
       await this.authService.saveRefreshToken(user.id, refreshToken);
 
       // // 응답 헤더에 리프레시 토큰 포함
-      res.setHeader('x-refresh-token', refreshToken);
+      // res.setHeader('x-refresh-token', refreshToken);
 
-      res.setHeader('x-access-token', accessToken);
+      // res.setHeader('x-access-token', accessToken);
 
       // 설문조사 상태 확인
       const survey = await this.surveyService.checkSurveyStatus(user.id);

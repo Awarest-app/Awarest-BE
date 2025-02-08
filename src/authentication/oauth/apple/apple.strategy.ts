@@ -12,9 +12,7 @@ export class AppleStrategy extends PassportStrategy(Strategy, 'apple') {
       clientID: process.env.APPLE_CLIENT_ID, // 서비스 ID (클라이언트 ID)
       teamID: process.env.APPLE_TEAM_ID, // Apple 팀 ID
       keyID: process.env.APPLE_KEY_ID, // Key ID
-      callbackURL:
-        process.env.APPLE_CALLBACK_URL ||
-        'http://localhost:3000/api/auth/apple/callback',
+      callbackURL: process.env.APPLE_CALLBACK_URL,
       // privateKey는 보통 여러 줄 문자열이므로, 환경변수 처리 시 개행문자 치환이 필요할 수 있음
       privateKey: process.env.APPLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
       scope: ['name', 'email'],

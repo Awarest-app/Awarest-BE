@@ -20,7 +20,7 @@ export class AuthService {
       username: user.username,
     };
     return this.jwtService.sign(payload, {
-      expiresIn: '1m', // 액세스 토큰 만료 시간
+      expiresIn: '2m', // 액세스 토큰 만료 시간
     });
   }
 
@@ -32,7 +32,7 @@ export class AuthService {
       username: user.username,
     };
     return this.jwtService.sign(payload, {
-      expiresIn: '3m', // 리프레시 토큰 만료 시간
+      expiresIn: '4m', // 리프레시 토큰 만료 시간
       secret: `${process.env.JWT_REFRESH_SECRET}`, // 리프레시 토큰용 별도 시크릿 사용
       // secret: 'somerefresh',
     });

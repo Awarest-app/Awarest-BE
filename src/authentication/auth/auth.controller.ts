@@ -98,16 +98,13 @@ export class AuthController {
       // return res.redirect('https://accounts.google.com/logout');
       return res.status(200).json({ message: 'update sceess' });
     } catch (error) {
-      throw new HttpException(
-        '유효하지 않거나 만료된 리프레시 토큰입니다.',
-        HttpStatus.UNAUTHORIZED,
-      );
+      throw new HttpException('failed to logout', HttpStatus.UNAUTHORIZED);
     }
   }
 
   // 회원 탈퇴 기능 (DELETE 요청)
   @Delete('delete')
-  async deleteUser(@Req() request: jwtRequest) {
+  async deleteUser(@Req() request: jwtRequest, @Res() res: Response) {
     try {
       const jwtUser = request.user;
       // 리프레시 토큰 검증
@@ -129,10 +126,11 @@ export class AuthController {
       // 사용자 삭제
       await this.usersService.deleteUser(user.id);
 
-      return { message: '사용자가 성공적으로 삭제되었습니다.' };
+      // return { message: '사용자가 성공적으로 삭제되었습니다.' };
+      return res.status(200).json({ message: 'user delete sceess' });
     } catch (error) {
       throw new HttpException(
-        '유효하지 않거나 만료된 리프레시 토큰입니다.',
+        'failed to user delete ',
         HttpStatus.UNAUTHORIZED,
       );
     }
@@ -243,7 +241,7 @@ export class AuthController {
     }
 
     try {
-      // refresh token 검증 (AuthService 내 verifyRefreshToken 메서드 사용)
+      // refresh token 검증
       const payload = this.authService.verifyRefreshToken(refreshToken);
 
       // 사용자 정보 조회 및 refresh token 일치 여부 확인
