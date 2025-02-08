@@ -31,7 +31,7 @@ function ormConfig(): TypeOrmModuleOptions {
     migrationsRun: commonConf.MIGRATIONS_RUN,
 
     //sql log
-    logging: true,
+    logging: false,
 
     ...(process.env.NODE_ENV === 'production' && {
       ssl: { rejectUnauthorized: false },

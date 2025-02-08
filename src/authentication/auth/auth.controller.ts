@@ -268,7 +268,7 @@ export class AuthController {
         // maxAge: 15 * 60 * 1000, // 15분
       });
 
-      // 모바일 등: 새 access token을 응답 헤더에 설정 (RFC 6750 형식)
+      // 모바일 : 새 access token을 응답 헤더에 설정 (RFC 6750 형식)
       res.setHeader('Authorization', `Bearer ${newAccessToken}`);
 
       // 필요에 따라 JSON 응답으로도 메시지를 보냅니다.
