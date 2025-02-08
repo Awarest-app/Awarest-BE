@@ -47,15 +47,22 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       // 우선 Authorization 헤더에서 refresh token을 가져옵니다.
 
       let refreshToken: string | undefined = undefined;
-      if (req.headers && req.headers.authorization) {
-        const authHeader = req.headers.authorization;
-        // Authorization 헤더에 "Bearer <token>" 형식으로 refresh token이 있을 경우
-        if (authHeader.startsWith('Bearer ')) {
-          refreshToken = authHeader.slice(7).trim();
-        }
+      // if (req.headers && req.headers.authorization) {
+      //   const authHeader = req.headers.authorization;
+      //   // Authorization 헤더에 "Bearer <token>" 형식으로 refresh token이 있을 경우
+      //   if (authHeader.startsWith('Bearer ')) {
+      //     refreshToken = authHeader.slice(7).trim();
+      //   }
+      //   console.log('refreshToken:', refreshToken);
+      // }
+      // 우선 'x-refresh-token' 헤더에서 refresh token을 가져옵니다.
+      if (req.headers && req.headers['x-refresh-token']) {
+        refreshToken = req.headers['x-refresh-token'] as string;
+        console.log('refreshToken (from x-refresh-token):', refreshToken);
       }
 
       // Authorization 헤더에 refresh token이 없다면 httpOnly 쿠키에서 가져옵니다.
+      // admin
       if (!refreshToken) {
         refreshToken = req.cookies?.refreshToken;
       }
