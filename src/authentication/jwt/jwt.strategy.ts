@@ -45,6 +45,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (payload.exp < now) {
       console.log('refreshtoken 으로 accesstoken재설정.');
       // 우선 Authorization 헤더에서 refresh token을 가져옵니다.
+
       let refreshToken: string | undefined = undefined;
       if (req.headers && req.headers.authorization) {
         const authHeader = req.headers.authorization;
@@ -53,10 +54,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
           refreshToken = authHeader.slice(7).trim();
         }
       }
+
       // Authorization 헤더에 refresh token이 없다면 httpOnly 쿠키에서 가져옵니다.
       if (!refreshToken) {
         refreshToken = req.cookies?.refreshToken;
       }
+
       // refresh token이 없다면 에러 발생
       if (!refreshToken) {
         // throw new HttpException(
@@ -86,7 +89,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
           { userId: payload.userId, email: payload.email },
           {
             secret: this.configService.get<string>('JWT_SECRET'),
-            expiresIn: '15m',
+            expiresIn: '1m',
           },
         );
         // 새 토큰을 요청 객체에 할당하여 인터셉터에서 응답 시 쿠키/헤더에 저장할 수 있도록 함

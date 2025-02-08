@@ -21,7 +21,7 @@ export class TokenRefreshInterceptor implements NestInterceptor {
         const newToken = (request as any).newToken;
         if (newToken) {
           // 헤더에 새로운 토큰 추가 (선택적)
-          response.setHeader('x-refresh-token', newToken);
+          response.setHeader('x-access-token', newToken);
 
           // 웹 환경: 쿠키에도 저장
           response.cookie('accessToken', newToken, {
