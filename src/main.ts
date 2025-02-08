@@ -5,7 +5,7 @@ import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    logger: ['log', 'error'], // 모든 로그 레벨 활성화
+    logger: ['warn', 'error'], // 모든 로그 레벨 활성화
   });
 
   app.enableCors({
