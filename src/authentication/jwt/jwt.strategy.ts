@@ -43,6 +43,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     // access token 만료 여부 체크
     if (payload.exp < now) {
       console.log('Access token expired. FE should call refresh endpoint.');
+      // 여기서 unauthorized message가 결정됨
       throw new UnauthorizedException(
         'Access token expired. Please refresh token.',
       );
