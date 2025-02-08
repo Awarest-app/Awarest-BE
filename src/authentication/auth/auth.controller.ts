@@ -17,6 +17,7 @@ import { AuthRequest, jwtRequest } from '@/type/request.interface';
 import { Response } from 'express';
 import { Public } from '../jwt/public.decorator';
 import { adminLoginProps } from './dto/auth.dto';
+import { Request } from 'express';
 
 class RefreshTokenDto {
   refreshToken: string;
@@ -187,6 +188,7 @@ export class AuthController {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
+      path: '/api/auth/refreshtoken', // refresh 요청에만 전송됨
     });
 
     // 쿠키에 토큰을 저장한 후 JSON 응답도 추가로 보낼 수 있습니다.
@@ -196,6 +198,7 @@ export class AuthController {
   }
 
   @Post('admin/logout')
+  @Public()
   async adminLogout(@Res({ passthrough: true }) res: Response) {
     // DB 상의 리프레시 토큰 폐기 로직 등 수행
 
@@ -214,5 +217,71 @@ export class AuthController {
     });
 
     return res.json({ message: '로그아웃 성공' });
+  }
+
+  @Post('refreshtoken')
+  @Public() // 인증 없이 접근 가능하도록 (토큰 갱신용)
+  async updateAccesstoken(@Req() req: Request, @Res() res: Response) {
+    let refreshToken: string | undefined = undefined;
+
+    // mobile
+    if (req.headers && req.headers['x-refresh-token']) {
+      refreshToken = req.headers['x-refresh-token'] as string;
+      console.log('refreshToken (from x-refresh-token):', refreshToken);
+    }
+
+    // admin (web)
+    if (!refreshToken) {
+      refreshToken = req.cookies?.refreshToken;
+    }
+
+    if (!refreshToken) {
+      throw new HttpException(
+        'Refresh token not provided.',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    try {
+      // refresh token 검증 (AuthService 내 verifyRefreshToken 메서드 사용)
+      const payload = this.authService.verifyRefreshToken(refreshToken);
+
+      // 사용자 정보 조회 및 refresh token 일치 여부 확인
+      const user = await this.usersService.findOne(payload.userId);
+      if (!user || user.refresh_token !== refreshToken) {
+        throw new HttpException(
+          'Invalid refresh token.',
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+
+      // 새 access token과 refresh token 생성
+      const newAccessToken = this.authService.generateAccessToken(user);
+
+      // 새로운 refresh token을 생성할 이유 없음,
+      // const newRefreshToken = this.authService.generateRefreshToken(user);
+      // await this.authService.saveRefreshToken(user.id, newRefreshToken);
+
+      // 쿠키에 새 토큰들을 설정 (httpOnly, secure, sameSite 옵션 적용)
+      res.cookie('accessToken', newAccessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        // maxAge: 15 * 60 * 1000, // 15분
+      });
+
+      // 모바일 등: 새 access token을 응답 헤더에 설정 (RFC 6750 형식)
+      res.setHeader('Authorization', `Bearer ${newAccessToken}`);
+
+      // 필요에 따라 JSON 응답으로도 메시지를 보냅니다.
+      return res.status(200).json({
+        message: 'Token refreshed successfully.',
+      });
+    } catch (error) {
+      throw new HttpException(
+        'Invalid or expired refresh token.',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
   }
 }

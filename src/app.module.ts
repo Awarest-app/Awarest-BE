@@ -69,10 +69,10 @@ import * as path from 'path';
       provide: APP_GUARD,
       useClass: JwtAuthGuard, // JwtAuthGuard를 전역 가드로 설정
     },
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: TokenRefreshInterceptor, // TokenRefreshInterceptor를 전역 인터셉터로 설정
-    },
+    // {
+    //   provide: APP_INTERCEPTOR,
+    //   useClass: TokenRefreshInterceptor, // TokenRefreshInterceptor를 전역 인터셉터로 설정
+    // },
     // meta data를 위한 reflector -> @public 처리
     Reflector,
     // FirebaseService,

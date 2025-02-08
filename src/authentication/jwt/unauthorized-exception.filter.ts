@@ -8,6 +8,7 @@ import {
 import { Response } from 'express';
 
 // jwt passport 내부에서 토큰이 없으면 무조건 Unauthorized를 던짐 , 커스텀 해야함
+// 401이면 무조건 토큰 재로그인인가, 유저가 pw를 틀리는 경우가 존재함, 따로 에러처리
 @Catch(UnauthorizedException)
 export class UnauthorizedExceptionFilter implements ExceptionFilter {
   catch(exception: UnauthorizedException, host: ArgumentsHost) {
