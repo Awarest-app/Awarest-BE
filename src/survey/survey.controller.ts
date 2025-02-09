@@ -3,8 +3,6 @@ import {
   Post,
   Body,
   Get,
-  Param,
-  UseGuards,
   Req,
   HttpException,
   HttpStatus,
@@ -45,7 +43,7 @@ export class SurveyController {
   @Get()
   async findByUser(@Req() request: jwtRequest) {
     const user = request.user;
-    console.log('survey user  : \n', user);
+    console.log('survey user  : ', user);
     return this.surveyService.findByUser(user.userId);
   }
 }
