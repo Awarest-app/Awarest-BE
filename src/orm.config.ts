@@ -12,7 +12,8 @@ function ormConfig(): TypeOrmModuleOptions {
     // 이래서 entities경로를 domain으로 설정되어 있던건가..?
     // ENTITIES: [__dirname + '/users/entities/*{.ts,.js}'],
     ENTITIES: [
-      __dirname + '/entities/*{.ts,.js}', // entity 폴더 경로
+      // __dirname + '/entities/*{.ts,.js}', // entity 폴더 경로
+      __dirname + '/**/*.entity.{ts,js}', // entity 폴더 경로
     ],
     MIGRATIONS: [__dirname + '/migrations/**/*{.ts,.js}'],
   };
