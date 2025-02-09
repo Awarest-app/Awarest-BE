@@ -16,7 +16,7 @@ export class SurveyController {
   constructor(private readonly surveyService: SurveyService) {}
 
   // 특정 사용자의 설문 데이터 조회
-  @Get()
+  @Get('user')
   async findByUser(@Req() request: jwtRequest) {
     const user = request.user;
     console.log('private survey user :\n', user);

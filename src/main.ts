@@ -29,7 +29,6 @@ async function bootstrap() {
       'X-Forwarded-Proto',
       'X-Forwarded-For',
       'X-Forwarded-Port',
-      // 'Skip-Auth',
       'x-refresh-token',
       'x-access-token',
     ],

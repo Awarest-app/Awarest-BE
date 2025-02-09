@@ -83,9 +83,6 @@ jobs:
       - name: Request Deployment
         run: aws deploy create-deployment --application-name $AWS_CODEDEPLOY_APPLICATION_NAME --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name $AWS_CODEDEPLOY_DEPLOYMENT_GROUP_NAME --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=$PROJECT_NAME/$GITHUB_SHA.zip
 
-      - name: Invalidate CloudFront Cache
-        run: aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
-
 env:
   S3_BUCKET_NAME: coura-server-bucket # S3 버킷 이름입니다.
   PROJECT_NAME: coura-be # S3 버킷 내 폴더 이름입니다. 임의로 정하면 알아서 생성해줍니다.

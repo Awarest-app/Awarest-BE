@@ -12,7 +12,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { SurveyModule } from './survey/survey.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './authentication/jwt/jwt.strategy';
-import { APP_GUARD, APP_INTERCEPTOR, Reflector } from '@nestjs/core';
+import { APP_GUARD, Reflector } from '@nestjs/core';
 import { JwtAuthGuard } from './authentication/jwt/jwt-auth.guard';
 import { QuestionModule } from './questions/question.module';
 import { SubquestionModule } from './subquestion/subquestion.module';
@@ -21,15 +21,12 @@ import { AnswersModule } from './answer/answers.module';
 import { UserQuestionModule } from './userQuestion/userQuestion.module';
 import { RedisModule } from './redis/redis.module';
 import { ProfileModule } from './profile/profile.module';
-import { TokenRefreshInterceptor } from './authentication/jwt/token-refresh.interceptor';
-import { FirebaseService } from './utils/firebase/firebase.service';
 import * as path from 'path';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      // envFilePath: `../config/.env.${process.env.NODE_ENV || 'development'}`, // NODE_ENV에 따라 다른 .env 파일 사용
       envFilePath: path.resolve(
         process.cwd(),
         'config',
@@ -50,7 +47,6 @@ import * as path from 'path';
     PassportModule.register({ defaultStrategy: 'jwt' }),
     TypeOrmModule.forRootAsync({ useFactory: ormConfig }),
     RedisModule,
-
     UsersModule,
     OauthModule,
     AuthModule,
@@ -69,10 +65,7 @@ import * as path from 'path';
       provide: APP_GUARD,
       useClass: JwtAuthGuard, // JwtAuthGuard를 전역 가드로 설정
     },
-    // {
-    //   provide: APP_INTERCEPTOR,
-    //   useClass: TokenRefreshInterceptor, // TokenRefreshInterceptor를 전역 인터셉터로 설정
-    // },
+
     // meta data를 위한 reflector -> @public 처리
     Reflector,
     // FirebaseService,
