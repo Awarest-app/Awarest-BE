@@ -1,4 +1,8 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Survey } from '@/entities/survey.entity';
@@ -50,9 +54,15 @@ export class SurveyService {
   //   return this.surveyRepository.find();
   // }
 
-  // 특정 사용자의 설문 데이터 조회
+  // 특정 사용자의 설문 데이터 조회,해당 데이터가 없다면 빈 배열 반환
   async findByUser(userId: number): Promise<Survey[]> {
-    return this.surveyRepository.find({ where: { userId } });
+    const surveys = await this.surveyRepository.find({ where: { userId } });
+    if (surveys.length === 0) {
+      throw new NotFoundException(
+        `유저 ID ${userId}의 설문조사가 존재하지 않습니다.`,
+      );
+    }
+    return surveys;
   }
 
   // 특정 사용자의 설문 상태 확인

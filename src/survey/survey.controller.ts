@@ -42,8 +42,9 @@ export class SurveyController {
   }
 
   // 특정 사용자의 설문 데이터 조회
-  @Get(':userId')
-  async findByUser(@Param('userId') userId: number) {
-    return this.surveyService.findByUser(userId);
+  @Get()
+  async findByUser(@Req() request: jwtRequest) {
+    const user = request.user;
+    return this.surveyService.findByUser(user.userId);
   }
 }
