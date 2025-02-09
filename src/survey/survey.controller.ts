@@ -16,7 +16,6 @@ export class SurveyController {
   constructor(private readonly surveyService: SurveyService) {}
 
   // 설문 결과 저장
-  // @UseGuards(JwtAuthGuard)
   @Post('save')
   async saveSurveyResults(
     @Req() request: jwtRequest,
@@ -40,10 +39,10 @@ export class SurveyController {
   }
 
   // 특정 사용자의 설문 데이터 조회
-  @Get()
+  @Get('user')
   async findByUser(@Req() request: jwtRequest) {
     const user = request.user;
-    console.log('survey user  : ', user);
+    console.log('private survey user :\n', user);
     return this.surveyService.findByUser(user.userId);
   }
 }
