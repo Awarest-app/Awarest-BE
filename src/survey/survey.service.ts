@@ -57,6 +57,7 @@ export class SurveyService {
   // 특정 사용자의 설문 데이터 조회,해당 데이터가 없다면 빈 배열 반환
   async findByUser(userId: number): Promise<Survey[]> {
     const surveys = await this.surveyRepository.find({ where: { userId } });
+    console.log('surveys:\n', surveys);
     if (surveys.length === 0) {
       throw new NotFoundException(
         `유저 ID ${userId}의 설문조사가 존재하지 않습니다.`,

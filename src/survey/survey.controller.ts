@@ -45,6 +45,7 @@ export class SurveyController {
   @Get()
   async findByUser(@Req() request: jwtRequest) {
     const user = request.user;
+    console.log('survey user  : \n', user);
     return this.surveyService.findByUser(user.userId);
   }
 }
