@@ -69,8 +69,14 @@ export class QuestionController {
   }
 
   @Put('/admin/update')
-  async updateQuestion(@Body() body: { questionId: number; content: string }) {
-    await this.questionService.updateQuestion(body.questionId, body.content);
+  async updateQuestion(
+    @Body() body: { questionId: number; content: string; depth: number },
+  ) {
+    await this.questionService.updateQuestion(
+      body.questionId,
+      body.content,
+      body.depth,
+    );
     return { success: true };
   }
 }

@@ -9,7 +9,7 @@ export class GoogleService {
 
   // 구글에 대한 로그인 처리
   async handleGoogleLogin(profile: ProfileProps) {
-    const { email } = profile;
+    const { email, username } = profile;
 
     // 이미 가입된 유저인지 판별
     let user = await this.usersService.findByEmail(email);

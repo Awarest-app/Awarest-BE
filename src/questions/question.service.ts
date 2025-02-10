@@ -499,6 +499,7 @@ export class QuestionService {
   async updateQuestion(
     questionId: number,
     content: string,
+    depth: number,
   ): Promise<Partial<Question> | null> {
     // 1️⃣ 먼저 해당 questionId가 존재하는지 확인
     console.log('prev updateQuestion', questionId, content);
@@ -510,8 +511,8 @@ export class QuestionService {
 
     // 2️⃣ content 업데이트 실행
     console.log('updateQuestion', questionId, content);
-    await this.questionRepo.update({ questionId }, { content });
+    await this.questionRepo.update({ questionId }, { content, depth });
 
-    return { questionId, content };
+    return { questionId, content, depth };
   }
 }
