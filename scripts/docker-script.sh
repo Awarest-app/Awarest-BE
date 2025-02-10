@@ -5,6 +5,8 @@
 
 docker-compose -f docker/docker-compose.prod.yml down
 
+docker system prune -a -f 
+
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 888577060888.dkr.ecr.us-east-1.amazonaws.com
 
 docker-compose -f docker/docker-compose.prod.yml pull
