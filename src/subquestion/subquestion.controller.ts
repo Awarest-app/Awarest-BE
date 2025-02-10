@@ -54,15 +54,17 @@ export class SubquestionController {
   // 새로운 질문 생성하는 부분 TODO
   @Post('/admin/create')
   async createNewQuestion(@Body() body: { content: IQuestionProps }) {
-    const { question_content, subquestion } = body.content;
+    const { question_content, subquestion, depth } = body.content;
 
     const savedQuestion = await this.subqService.createQuestion(
       question_content,
       subquestion,
+      depth,
     );
     return { success: true, questionId: savedQuestion.questionId };
   }
 
+  // subquestion 하나만 생성
   @Post('/admin/create/subquestion')
   async create(@Body() body: { questionId: number; content: string }) {
     return this.subqService.create(body.questionId, body.content);

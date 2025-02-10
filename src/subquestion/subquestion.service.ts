@@ -78,10 +78,12 @@ export class SubquestionService {
   async createQuestion(
     questionContent: string,
     subquestions: string[],
+    depth: number,
   ): Promise<Question> {
     // 1. 질문 저장
     const question = this.questionRepo.create({
       content: questionContent,
+      depth: depth,
     });
     const savedQuestion = await this.questionRepo.save(question);
 

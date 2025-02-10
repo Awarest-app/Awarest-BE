@@ -11,7 +11,9 @@ export class AppleService {
     console.log('Callback user data: inner profile', profile);
     const { email } = profile;
 
+    console.log('Callback user data: inner username', email);
     const username = email.split('@')[0];
+    console.log('Callback user data: inner username', username);
 
     // 이메일을 기준으로 이미 가입된 사용자 확인
     let user = await this.usersService.findByEmail(email);
