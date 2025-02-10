@@ -38,7 +38,11 @@ jobs:
       # 레포지토리를 압축시킵니다.
       # 다만 불필요한 node_module, coverage, src, test, readme, .git* 등의 파일은 제외시킵니다.
       - name: Make a zip file
-        run: zip -r ./$GITHUB_SHA.zip . -x "node_modules/*" "coverage/*" "src/*" "test/*" "README.md" "*.git*"
+        run: |
+          sed -i "s|__IMAGE_TAG__|${GITHUB_SHA}|" docker/docker-compose.prod.yml
+
+          zip -r ./$GITHUB_SHA.zip . -x "node_modules/*" "coverage/*" "src/*" "test/*" "README.md" "*.git*"
+
         shell: bash
 
       # 위에서 생성한 IAM 사용자 정보를 넣어 자격 증명을 수행합니다.
@@ -67,13 +71,25 @@ jobs:
           # docker build -t $REPOSITORY:$IMAGE_TAG .
 
           # Dockerfile이 /docker 폴더 내에 있으므로 -f 옵션으로 경로를 지정합니다.
-          docker build -f docker/Dockerfile.aws -t $REPOSITORY:$IMAGE_TAG .
+          # docker build -f docker/Dockerfile.aws -t $REPOSITORY:$IMAGE_TAG .
+
+          # 예시: 동시에 latest + Git SHA로 이미지 빌드
+          docker build -f docker/Dockerfile.aws -t $REPOSITORY:$IMAGE_TAG  -t $REPOSITORY:${{ github.sha }}
+
 
           # 4. ECR에 push할 태그 생성
           docker tag $REPOSITORY:$IMAGE_TAG $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          docker tag $REPOSITORY:${{ github.sha }} $REGISTRY/$REPOSITORY:${{ github.sha }}
 
           # 5. Docker 이미지를 ECR에 푸시
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
+          docker push $REGISTRY/$REPOSITORY:${{ github.sha }}
+
+          # # 4. ECR에 push할 태그 생성
+          # docker tag $REPOSITORY:$IMAGE_TAG $REGISTRY/$REPOSITORY:$IMAGE_TAG
+
+          # # 5. Docker 이미지를 ECR에 푸시
+          # docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
       # 위에서 만든 zip 파일을 S3에 업로드 합니다.
       - name: Upload to S3

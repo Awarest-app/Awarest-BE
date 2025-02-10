@@ -29,7 +29,8 @@ services:
 
   nest-app:
     container_name: nest-app
-    image: '888577060888.dkr.ecr.us-east-1.amazonaws.com/server-repository:latest'
+    # image: '888577060888.dkr.ecr.us-east-1.amazonaws.com/server-repository:latest'
+    image: '888577060888.dkr.ecr.us-east-1.amazonaws.com/server-repository:__IMAGE_TAG__'
     env_file:
       - ../config/.env.production
     # build: .
