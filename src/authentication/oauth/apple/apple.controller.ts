@@ -45,7 +45,8 @@ export class AppleController {
       // Passport가 req.user에 Apple에서 추출한 사용자 정보를 채워줍니다.
       console.log('Callback URL hit with query:', req.query); // 추가
       console.log('Callback user data:', req.user); // 추가
-      const user = await this.appleService.handleAppleLogin(req.user);
+
+      const user = await this.appleService.handleAppleLogin(req.user.profile);
 
       // 액세스 토큰 및 리프레시 토큰 생성
       const accessToken = this.authService.generateAccessToken(user);

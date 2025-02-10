@@ -13,4 +13,7 @@ export class AppleUserDataDto {
 
   /** 사용자의 이메일 주소 */
   email: string;
+
+  /** 사용자의 이름 */
+  name: string;
 }

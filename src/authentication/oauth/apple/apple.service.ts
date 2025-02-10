@@ -9,6 +9,7 @@ export class AppleService {
   constructor(private readonly usersService: UsersService) {}
 
   async handleAppleLogin(profile: ProfileProps) {
+    console.log('Callback user data: inner profile', profile);
     const { email, username } = profile;
 
     // 이메일을 기준으로 이미 가입된 사용자 확인

@@ -28,15 +28,13 @@ export class AppleStrategy extends PassportStrategy(Strategy, 'apple') {
         teamID: configService.get<string>('APPLE_TEAM_ID'),
         callbackURL: configService.get<string>('APPLE_CALLBACK_URL'),
         keyID: configService.get<string>('APPLE_KEY_ID'),
-        // privateKeyString: configService.get<string>('APPLE_PRIVATE_KEY'),
-        // privateKey: configService.get<string>('APPLE_PRIVATE_KEY'),
         privateKeyString: configService
           .get<string>('APPLE_PRIVATE_KEY')
           .replace(/\\n/g, '\n'),
-        // privateKeyString: readFileSync(
-        //   configService.get<string>('APPLE_KEYFILE_PATH'),
-        // ),
+
         passReqToCallback: true,
+
+        scope: ['name', 'email'],
       },
       async function (req, accessToken, refreshToken, idToken, profile, cb) {
         try {
