@@ -19,7 +19,7 @@ export class AppleStrategy extends PassportStrategy(Strategy) {
     // private readonly logger: PinoLogger,
   ) {
     // logger.setContext(AppleStrategy.name);
-    console.log(AppleStrategy.name);
+    console.log('AppleStrategy.name', AppleStrategy.name);
 
     super(
       {
@@ -27,7 +27,8 @@ export class AppleStrategy extends PassportStrategy(Strategy) {
         teamID: configService.get<string>('APPLE_TEAM_ID'),
         callbackURL: configService.get<string>('APPLE_CALLBACK_URL'),
         keyID: configService.get<string>('APPLE_KEY_ID'),
-        privateKeyString: configService.get<string>('APPLE_PRIVATE_KEY'),
+        // privateKeyString: configService.get<string>('APPLE_PRIVATE_KEY'),
+        privateKey: process.env.APPLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
         // privateKeyString: readFileSync(
         //   configService.get<string>('APPLE_KEYFILE_PATH'),
         // ),
