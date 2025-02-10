@@ -11,7 +11,7 @@ import { AppleUserDataDto, CreateUserDto } from './dto/apple.dto';
 // import { CreateUserDto } from '../../user/create_user.dto';
 
 @Injectable()
-export class AppleStrategy extends PassportStrategy(Strategy) {
+export class AppleStrategy extends PassportStrategy(Strategy, 'apple') {
   constructor(
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
@@ -19,7 +19,7 @@ export class AppleStrategy extends PassportStrategy(Strategy) {
     // private readonly logger: PinoLogger,
   ) {
     // logger.setContext(AppleStrategy.name);
-    console.log('AppleStrategy.name', AppleStrategy.name);
+    console.error('AppleStrategy.name', AppleStrategy.name);
 
     super(
       {
@@ -39,7 +39,7 @@ export class AppleStrategy extends PassportStrategy(Strategy) {
       async function (req, accessToken, refreshToken, idToken, profile, cb) {
         try {
           const idTokenDecoded = jwtService.decode(idToken) as AppleUserDataDto;
-          console.log('idTokenDecoded:', idTokenDecoded);
+          console.error('idTokenDecoded:', idTokenDecoded);
           // logger.debug(JSON.stringify(idTokenDecoded));
 
           const provider = 'apple';
@@ -61,7 +61,7 @@ export class AppleStrategy extends PassportStrategy(Strategy) {
           // await userService.create(userData);
           cb(null, userData);
         } catch (error) {
-          console.log('AppleStrategy error:', error);
+          console.error('AppleStrategy error:', error);
           // logger.error(error);
         }
       },

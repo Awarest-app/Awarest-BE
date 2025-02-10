@@ -16,7 +16,7 @@ import { Response } from 'express';
 import { AuthRequest } from '@/type/request.interface';
 import { SurveyService } from '@/survey/survey.service';
 import { Public } from '@/authentication/jwt/public.decorator';
-import { OAuth2Error } from 'passport-oauth2'; // OAuth2Error 임포트
+// import { OAuth2Error } from 'passport-oauth2'; // OAuth2Error 임포트
 
 @Controller('api/auth/google')
 export class GoogleController {
