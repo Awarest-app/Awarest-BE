@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
 // import { UnauthorizedExceptionFilter } from './authentication/jwt/unauthorized-exception.filter';
+import * as express from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -41,6 +42,8 @@ async function bootstrap() {
   //     transform: true,
   //   }),
   // );
+
+  app.use(express.urlencoded({ extended: true })); // urlencoded 파싱 미들웨어 추가
 
   // app.set('trust proxy', 1);
   // Express 애플리케이션으로 캐스팅하여 `set` 메서드 사용 가능하게 함
