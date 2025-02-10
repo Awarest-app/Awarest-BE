@@ -5,6 +5,7 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  Post,
   Req,
   Res,
   UseGuards,
@@ -36,7 +37,7 @@ export class AppleController {
   }
 
   // 2) Apple OAuth 콜백
-  @Get('callback')
+  @Post('callback')
   @Public()
   @UseGuards(AppleAuthGuard)
   async appleAuthCallback(@Req() req: AuthRequest, @Res() res: Response) {
