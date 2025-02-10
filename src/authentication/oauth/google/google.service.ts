@@ -1,5 +1,5 @@
 // src/authentication/oauth/google/google.service.ts
-import { ConflictException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UsersService } from '@/users/users.service';
 import { ProfileProps } from './dto/google.auth.type';
 
@@ -9,7 +9,7 @@ export class GoogleService {
 
   // 구글에 대한 로그인 처리
   async handleGoogleLogin(profile: ProfileProps) {
-    const { email, username } = profile;
+    const { email } = profile;
 
     // 이미 가입된 유저인지 판별
     let user = await this.usersService.findByEmail(email);

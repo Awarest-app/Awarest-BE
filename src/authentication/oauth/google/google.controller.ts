@@ -16,7 +16,6 @@ import { Response } from 'express';
 import { AuthRequest } from '@/type/request.interface';
 import { SurveyService } from '@/survey/survey.service';
 import { Public } from '@/authentication/jwt/public.decorator';
-// import { OAuth2Error } from 'passport-oauth2'; // OAuth2Error 임포트
 
 @Controller('api/auth/google')
 export class GoogleController {
@@ -48,11 +47,6 @@ export class GoogleController {
 
       // 리프레시 토큰을 데이터베이스에 저장
       await this.authService.saveRefreshToken(user.id, refreshToken);
-
-      // // 응답 헤더에 리프레시 토큰 포함
-      // res.setHeader('x-refresh-token', refreshToken);
-
-      // res.setHeader('x-access-token', accessToken);
 
       // 설문조사 상태 확인
       const survey = await this.surveyService.checkSurveyStatus(user.id);

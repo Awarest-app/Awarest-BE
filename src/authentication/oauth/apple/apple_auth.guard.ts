@@ -8,7 +8,7 @@ export class AppleAuthGuard extends AuthGuard('apple') {
     super();
   }
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    console.log('🚀 AppleAuthGuard 실행됨!');
+    // console.log('AppleAuthGuard 실행됨!');
     return (await super.canActivate(context)) as boolean;
   }
 }

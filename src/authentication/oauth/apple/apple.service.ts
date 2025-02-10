@@ -1,5 +1,5 @@
 // src/authentication/oauth/apple/apple.service.ts
-import { ConflictException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UsersService } from '@/users/users.service';
 import { ProfileProps } from '../google/dto/google.auth.type';
 
