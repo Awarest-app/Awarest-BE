@@ -2,6 +2,7 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-apple';
+import { generateAppleClientSecret } from './apple-token.util';
 
 @Injectable()
 export class AppleStrategy extends PassportStrategy(Strategy, 'apple') {
@@ -14,7 +15,9 @@ export class AppleStrategy extends PassportStrategy(Strategy, 'apple') {
       keyID: process.env.APPLE_KEY_ID, // Key ID
       callbackURL: process.env.APPLE_CALLBACK_URL,
       // privateKey는 보통 여러 줄 문자열이므로, 환경변수 처리 시 개행문자 치환이 필요할 수 있음
-      privateKey: process.env.APPLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+      // privateKey: process.env.APPLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+      privateKey: generateAppleClientSecret(),
+
       scope: ['name', 'email'],
       passReqToCallback: false, // 필요 시 요청 객체를 콜백으로 전달
     });

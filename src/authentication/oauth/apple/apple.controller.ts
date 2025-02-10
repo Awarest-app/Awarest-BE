@@ -30,14 +30,14 @@ export class AppleController {
   // 1) Apple OAuth 시작 (리다이렉트)
   @Get()
   @Public() // 인증 제외
-  @UseGuards(AppleAuthGuard)
+  // @UseGuards(AppleAuthGuard)
   async appleAuth() {
     console.log('Apple OAuth 시작');
     // 이 엔드포인트는 Apple 로그인 페이지로 리다이렉트됩니다.
   }
 
   // 2) Apple OAuth 콜백
-  @Post('callback')
+  @Get('callback')
   @Public()
   @UseGuards(AppleAuthGuard)
   async appleAuthCallback(@Req() req: AuthRequest, @Res() res: Response) {

@@ -1,5 +1,14 @@
 // src/subquestion/subquestion.controller.ts
-import { Controller, Get, Post, Body, Param, Put, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Put,
+  Req,
+  Delete,
+} from '@nestjs/common';
 import { SubquestionService } from './subquestion.service';
 import { jwtRequest } from '@/type/request.interface';
 import { IQuestionProps } from '@/questions/dto/question.dto';
@@ -35,6 +44,11 @@ export class SubquestionController {
   async update(@Param('id') id: number, @Body() body: { content: string }) {
     console.log('subquestion.controller.ts: update', id, body.content);
     return this.subqService.update(id, body.content);
+  }
+
+  @Delete('delete/:subquestionId')
+  async delete(@Param('subquestionId') subquestionId: number) {
+    return this.subqService.remove(subquestionId);
   }
 
   // 새로운 질문 생성하는 부분 TODO

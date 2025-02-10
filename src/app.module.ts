@@ -40,7 +40,7 @@ import * as path from 'path';
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: '15m' }, // 기본 액세스 토큰 만료 시간
+        signOptions: { expiresIn: '30m' }, // 기본 액세스 토큰 만료 시간
       }),
       global: true, // JwtModule을 전역으로 설정
     }),
