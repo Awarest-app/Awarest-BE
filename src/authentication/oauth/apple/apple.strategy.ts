@@ -29,7 +29,8 @@ export class AppleStrategy extends PassportStrategy(Strategy, 'apple') {
         callbackURL: configService.get<string>('APPLE_CALLBACK_URL'),
         keyID: configService.get<string>('APPLE_KEY_ID'),
         // privateKeyString: configService.get<string>('APPLE_PRIVATE_KEY'),
-        privateKey: configService
+        // privateKey: configService.get<string>('APPLE_PRIVATE_KEY'),
+        privateKeyString: configService
           .get<string>('APPLE_PRIVATE_KEY')
           .replace(/\\n/g, '\n'),
         // privateKeyString: readFileSync(
