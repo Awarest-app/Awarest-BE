@@ -74,7 +74,7 @@ jobs:
           # docker build -f docker/Dockerfile.aws -t $REPOSITORY:$IMAGE_TAG .
 
           # 예시: 동시에 latest + Git SHA로 이미지 빌드
-          docker build -f docker/Dockerfile.aws -t $REPOSITORY:$IMAGE_TAG  -t $REPOSITORY:${{ github.sha }}
+          docker build -f docker/Dockerfile.aws -t $REPOSITORY:$IMAGE_TAG  -t $REPOSITORY:${{ github.sha }} .
 
 
           # 4. ECR에 push할 태그 생성
