@@ -19,6 +19,7 @@ export class AppleStrategy extends PassportStrategy(Strategy, 'apple') {
     // private readonly logger: PinoLogger,
   ) {
     // logger.setContext(AppleStrategy.name);
+    console.log('AppleStrategy.name 실행');
     console.error('AppleStrategy.name', AppleStrategy.name);
 
     super(
@@ -38,6 +39,11 @@ export class AppleStrategy extends PassportStrategy(Strategy, 'apple') {
       },
       async function (req, accessToken, refreshToken, idToken, profile, cb) {
         try {
+          console.log('AppleStrategy verify callback 실행됨');
+          console.log('accessToken:', accessToken);
+          console.log('refreshToken:', refreshToken);
+          console.log('idToken:', idToken);
+
           const idTokenDecoded = jwtService.decode(idToken) as AppleUserDataDto;
           console.error('idTokenDecoded:', idTokenDecoded);
           // logger.debug(JSON.stringify(idTokenDecoded));

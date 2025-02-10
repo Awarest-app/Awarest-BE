@@ -11,6 +11,7 @@ import { JwtStrategy } from '../jwt/jwt.strategy';
 import { AppleController } from './apple/apple.controller';
 import { AppleStrategy } from './apple/apple.strategy';
 import { AppleService } from './apple/apple.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { AppleService } from './apple/apple.service';
   ],
   controllers: [GoogleController, AppleController],
   providers: [
+    JwtService,
     GoogleService,
     GoogleStrategy,
     JwtStrategy,
