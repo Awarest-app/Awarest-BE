@@ -78,6 +78,7 @@ jobs:
       # 위에서 만든 zip 파일을 S3에 업로드 합니다.
       - name: Upload to S3
         run: aws s3 cp --region ${{ secrets.AWS_REGION }} ./$GITHUB_SHA.zip s3://$S3_BUCKET_NAME/$PROJECT_NAME/$GITHUB_SHA.zip
+        # aws s3 cp --region ${{ secrets.AWS_REGION }} ./$GITHUB_SHA.zip s3://$S3_BUCKET_NAME/$PROJECT_NAME/deploy-$GITHUB_SHA.zip
 
       # CodeDeploy에게 deployment를 생성하도록 요청합니다.
       - name: Request Deployment
