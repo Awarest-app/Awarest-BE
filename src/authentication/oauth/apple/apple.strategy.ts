@@ -3,22 +3,14 @@ import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { JwtService } from '@nestjs/jwt';
 import { Strategy } from 'passport-apple';
-// import { PinoLogger } from 'nestjs-pino';
-// import { readFileSync } from 'fs';
 import { AppleUserDataDto, CreateUserDto } from './dto/apple.dto';
-// import { AppleUserDataDto } from './apple_user_data.dto';
-// import { UserService } from '../../user/user.service';
-// import { CreateUserDto } from '../../user/create_user.dto';
 
 @Injectable()
 export class AppleStrategy extends PassportStrategy(Strategy, 'apple') {
   constructor(
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
-    // private readonly userService: UserService,
-    // private readonly logger: PinoLogger,
   ) {
-    // logger.setContext(AppleStrategy.name);
     console.log('AppleStrategy.name 실행');
     console.error('AppleStrategy.name', AppleStrategy.name);
 
@@ -33,15 +25,16 @@ export class AppleStrategy extends PassportStrategy(Strategy, 'apple') {
           .replace(/\\n/g, '\n'),
 
         passReqToCallback: true,
-
         scope: ['name', 'email'],
       },
+
       async function (req, accessToken, refreshToken, idToken, profile, cb) {
         try {
           console.log('AppleStrategy verify callback 실행됨');
           console.log('accessToken:', accessToken);
           console.log('refreshToken:', refreshToken);
           console.log('idToken:', idToken);
+          console.log('profile:', profile);
 
           const idTokenDecoded = jwtService.decode(idToken) as AppleUserDataDto;
           console.error('idTokenDecoded:', idTokenDecoded);
