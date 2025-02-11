@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DataSource, In, Repository } from 'typeorm';
+import { DataSource, In, Not, Repository } from 'typeorm';
 import { Question } from '@/entities/question.entity';
 import { QuestionMapping } from '@/entities/question-mapping.entity';
 import { Survey } from '@/entities/survey.entity';
