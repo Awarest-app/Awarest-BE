@@ -163,6 +163,90 @@ export class QuestionService {
    * leftover를 제외한 새 질문 neededCount개 뽑아서 questionId 배열로 반환
    * 실제 질문 로직(가중치 기반)은 아래에서 재활용
    */
+  // private async getNewQuestionIds(
+  //   userId: number,
+  //   excludeQuestionIds: number[],
+  //   neededCount: number,
+  // ): Promise<number[]> {
+  //   if (neededCount <= 0) return [];
+
+  //   // (기존에 작성하셨던 가중치 로직)
+  //   // 1) 사용자 설문 정보 가져오기
+  //   const survey = await this.surveyRepo.findOne({ where: { userId } });
+  //   if (!survey) {
+  //     return [];
+  //   }
+  //   const orConditions = [];
+  //   if (survey.ageRange) {
+  //     orConditions.push({
+  //       categoryName: 'age_range',
+  //       categoryValue: survey.ageRange,
+  //     });
+  //   }
+  //   if (survey.job) {
+  //     orConditions.push({ categoryName: 'job', categoryValue: survey.job });
+  //   }
+  //   if (survey.goal) {
+  //     orConditions.push({ categoryName: 'goal', categoryValue: survey.goal });
+  //   }
+  //   if (orConditions.length === 0) {
+  //     return [];
+  //   }
+
+  //   // 2) question_mapping에서 조건에 맞는 레코드 검색
+  //   const mappings = await this.questionMapRepo.find({ where: orConditions });
+
+  //   // 3) 이미 유저가 DB 상에서 사용한 적 있는 questionId도 제외
+  //   const userQuestions = await this.userQuestionRepo.find({
+  //     where: { userId },
+  //   });
+  //   const userQuestionIds = userQuestions.map((uq) => uq.questionId);
+
+  //   // 4) excludeQuestionIds( leftover ) + userQuestionIds 를 전부 제외
+  //   const allExcluded = new Set([...excludeQuestionIds, ...userQuestionIds]);
+
+  //   const filteredMappings = mappings.filter(
+  //     (map) => !allExcluded.has(map.questionId),
+  //   );
+
+  //   // 5) questionId별로 가중치 합산
+  //   const weightMap: Record<number, number> = {};
+  //   for (const map of filteredMappings) {
+  //     if (!weightMap[map.questionId]) {
+  //       weightMap[map.questionId] = 0;
+  //     }
+  //     weightMap[map.questionId] += map.weight;
+  //   }
+
+  //   // 6) 가중치가 부여된 questionId 들만
+  //   const questionIds = Object.keys(weightMap).map(Number);
+  //   if (questionIds.length === 0) {
+  //     return [];
+  //   }
+
+  //   // 실제 Question 테이블에 있는지 확인
+  //   const questions = await this.questionRepo.findByIds(questionIds);
+  //   // 질문이 존재하는 questionIds만
+  //   const validQuestionIds = questions.map((q) => q.questionId);
+
+  //   // 7) 가중치 내림차순 정렬
+  //   validQuestionIds.sort((a, b) => weightMap[b] - weightMap[a]);
+
+  //   // 8) neededCount만큼 잘라서 반환
+  //   return validQuestionIds.slice(0, neededCount);
+  // }
+
+  // async getQuestionsByIds(questionIds: number[]): Promise<Question[]> {
+  //   if (questionIds.length === 0) return [];
+
+  //   // In 연산자를 사용하여 주어진 ID 배열에 해당하는 엔티티를 검색
+  //   const questions = await this.questionRepo.findBy({
+  //     questionId: In(questionIds),
+  //   });
+
+  //   return questions;
+  // }
+
   private async getNewQuestionIds(
     userId: number,
     excludeQuestionIds: number[],
@@ -170,8 +254,7 @@ export class QuestionService {
   ): Promise<number[]> {
     if (neededCount <= 0) return [];
 
-    // (기존에 작성하셨던 가중치 로직)
-    // 1) 사용자 설문 정보 가져오기
+    // 1️⃣ 사용자 설문 정보 가져오기
     const survey = await this.surveyRepo.findOne({ where: { userId } });
     if (!survey) {
       return [];
@@ -193,23 +276,23 @@ export class QuestionService {
       return [];
     }
 
-    // 2) question_mapping에서 조건에 맞는 레코드 검색
+    // 2️⃣ question_mapping에서 조건에 맞는 레코드 검색
     const mappings = await this.questionMapRepo.find({ where: orConditions });
 
-    // 3) 이미 유저가 DB 상에서 사용한 적 있는 questionId도 제외
+    // 3️⃣ 이미 유저가 DB 상에서 사용한 적 있는 questionId도 제외
     const userQuestions = await this.userQuestionRepo.find({
       where: { userId },
     });
     const userQuestionIds = userQuestions.map((uq) => uq.questionId);
 
-    // 4) excludeQuestionIds( leftover ) + userQuestionIds 를 전부 제외
+    // 4️⃣ excludeQuestionIds와 userQuestionIds를 모두 제외
     const allExcluded = new Set([...excludeQuestionIds, ...userQuestionIds]);
 
     const filteredMappings = mappings.filter(
       (map) => !allExcluded.has(map.questionId),
     );
 
-    // 5) questionId별로 가중치 합산
+    // 5️⃣ questionId별로 가중치 합산
     const weightMap: Record<number, number> = {};
     for (const map of filteredMappings) {
       if (!weightMap[map.questionId]) {
@@ -218,34 +301,37 @@ export class QuestionService {
       weightMap[map.questionId] += map.weight;
     }
 
-    // 6) 가중치가 부여된 questionId 들만
-    const questionIds = Object.keys(weightMap).map(Number);
-    if (questionIds.length === 0) {
-      return [];
+    let validQuestionIds: number[] = [];
+    const questionIdsFromMapping = Object.keys(weightMap).map(Number);
+
+    if (questionIdsFromMapping.length > 0) {
+      // 6-1) mapping 데이터가 있는 경우:
+      // 실제 Question 테이블에 존재하는 questionId들만 필터링
+      const questions = await this.questionRepo.findByIds(
+        questionIdsFromMapping,
+      );
+      validQuestionIds = questions.map((q) => q.questionId);
+
+      // 7) 가중치 내림차순 정렬 (매핑이 없으면 해당 값은 0으로 간주)
+      validQuestionIds.sort(
+        (a, b) => (weightMap[b] ?? 0) - (weightMap[a] ?? 0),
+      );
+    } else {
+      // 6-2) mapping 데이터가 하나도 없는 경우:
+      // Question 테이블에서 allExcluded에 포함되지 않는 모든 질문을 가져옴.
+      const questions = await this.questionRepo.find({
+        where: {
+          questionId: Not(In([...allExcluded])),
+        },
+      });
+      validQuestionIds = questions.map((q) => q.questionId);
+      // mapping이 없으므로 가중치는 모두 0으로 처리 (정렬은 따로 필요없음)
     }
 
-    // 실제 Question 테이블에 있는지 확인
-    const questions = await this.questionRepo.findByIds(questionIds);
-    // 질문이 존재하는 questionIds만
-    const validQuestionIds = questions.map((q) => q.questionId);
-
-    // 7) 가중치 내림차순 정렬
-    validQuestionIds.sort((a, b) => weightMap[b] - weightMap[a]);
-
-    // 8) neededCount만큼 잘라서 반환
+    // 8️⃣ neededCount만큼 잘라서 반환
     return validQuestionIds.slice(0, neededCount);
   }
 
-  // async getQuestionsByIds(questionIds: number[]): Promise<Question[]> {
-  //   if (questionIds.length === 0) return [];
-
-  //   // In 연산자를 사용하여 주어진 ID 배열에 해당하는 엔티티를 검색
-  //   const questions = await this.questionRepo.findBy({
-  //     questionId: In(questionIds),
-  //   });
-
-  //   return questions;
-  // }
   async getQuestionsByIds(
     userId: number,
     questionIds: number[],
