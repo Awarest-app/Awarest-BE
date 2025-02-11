@@ -304,7 +304,7 @@ export class QuestionService {
     let validQuestionIds: number[] = [];
     const questionIdsFromMapping = Object.keys(weightMap).map(Number);
 
-    if (questionIdsFromMapping.length > 0) {
+    if (questionIdsFromMapping.length > 3) {
       // 6-1) mapping 데이터가 있는 경우:
       // 실제 Question 테이블에 존재하는 questionId들만 필터링
       const questions = await this.questionRepo.findByIds(
