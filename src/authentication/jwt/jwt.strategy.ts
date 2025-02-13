@@ -57,9 +57,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!user) {
       throw new UnauthorizedException('User not found.');
     }
-    if (user.email !== payload.email) {
-      throw new UnauthorizedException('Token email does not match user email.');
-    }
+    // if (user.email !== payload.email) {
+    //   throw new UnauthorizedException('Token email does not match user email.');
+    // }
     // console.log('success');
 
     // request.user에 필요한 정보를 반환
