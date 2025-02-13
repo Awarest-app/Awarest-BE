@@ -36,14 +36,16 @@ export class AppleService {
     }
 
     // 가입된 사용자가 없다면 OAuth 회원가입 진행
-    const encryptedEmail = await this.encryptionService.encrypt(email);
-    user = await this.usersService.createOauthUser({
-      email: encryptedEmail,
-      username,
-      oauthProvider: 'apple',
-    });
-    // Decrypt email before returning
-    user.email = email;
+    if (!user) {
+      const encryptedEmail = await this.encryptionService.encrypt(email);
+      user = await this.usersService.createOauthUser({
+        email: encryptedEmail,
+        username,
+        oauthProvider: 'apple',
+      });
+      // Decrypt email before returning
+      // user.email = email;
+    }
 
     return user;
   }

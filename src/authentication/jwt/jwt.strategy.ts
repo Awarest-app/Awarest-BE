@@ -41,7 +41,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const now = Math.floor(Date.now() / 1000);
 
     // access token 만료 여부 체크
-    // console.log('payload: \n', payload);
     if (payload.exp < now) {
       console.log('Access token expired. FE should call refresh endpoint.');
       // 여기서 unauthorized message가 결정됨
@@ -49,8 +48,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         'Access token expired. Please refresh token.',
       );
     }
-
-    // console.log('payload: \n', payload);
 
     // 사용자 정보 조회 (DB 조회 등)
     const user = await this.usersService.findOne(payload.userId);

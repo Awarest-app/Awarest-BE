@@ -3,8 +3,7 @@ import * as CryptoJS from 'crypto-js';
 
 @Injectable()
 export class EncryptionService {
-  private readonly SECRET_KEY =
-    process.env.ENCRYPTION_KEY || 'default-secret-key';
+  private readonly SECRET_KEY = process.env.ENCRYPTION_KEY;
 
   /**
    * Encrypt a string using AES encryption
