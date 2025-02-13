@@ -65,9 +65,9 @@ export class UsersService {
     return user;
   }
 
+  // email은 암호화 되어 있음
   async findByEmail(email: string): Promise<User | null> {
     // 복호화 후 이메일로 사용자 조회하기
-    // const encryptedEmail = await this.encryptUserEmail(email);
     const user = await this.usersRepository.findOneBy({
       email,
     });
