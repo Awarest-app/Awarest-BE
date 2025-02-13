@@ -41,7 +41,6 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     const now = Math.floor(Date.now() / 1000);
 
     // access token 만료 여부 체크
-    // console.log('payload: \n', payload);
     if (payload.exp < now) {
       console.log('Access token expired. FE should call refresh endpoint.');
       // 여기서 unauthorized message가 결정됨
@@ -55,9 +54,10 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (!user) {
       throw new UnauthorizedException('User not found.');
     }
-    if (user.email !== payload.email) {
-      throw new UnauthorizedException('Token email does not match user email.');
-    }
+    // if (user.email !== payload.email) {
+    //   throw new UnauthorizedException('Token email does not match user email.');
+    // }
+    // console.log('success');
 
     // request.user에 필요한 정보를 반환
     return { userId: user.id, email: user.email, username: user.username };

@@ -18,6 +18,7 @@ export class ProfileService {
     return this.profileRepository.find();
   }
 
+  // profile 없으면 새로 생성함
   async setNotification(
     userId: number,
     username: string,

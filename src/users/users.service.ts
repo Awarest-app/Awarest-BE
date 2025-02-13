@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
 import { Answer } from '@/entities/answer.entity';
+import { PasswordService } from '@/authentication/password/password.service';
+import { EncryptionService } from '@/authentication/encryption/encryption.service';
 
 @Injectable()
 export class UsersService {
@@ -10,40 +12,97 @@ export class UsersService {
     @InjectRepository(User) private usersRepository: Repository<User>,
     @InjectRepository(Answer)
     private readonly answerRepository: Repository<Answer>,
+    private readonly passwordService: PasswordService,
+    private readonly encryptionService: EncryptionService,
   ) {}
 
-  findAll(): Promise<User[]> {
-    return this.usersRepository.find();
+  private async encryptUserEmail(email: string): Promise<string> {
+    return this.encryptionService.encrypt(email);
   }
 
-  findOne(id: number): Promise<User> {
-    return this.usersRepository.findOneBy({ id });
+  private async decryptUserEmail(encryptedEmail: string): Promise<string> {
+    return this.encryptionService.decrypt(encryptedEmail);
   }
 
+  // async createUser(data: {
+  //   email: string;
+  //   password: string;
+  //   username?: string;
+  // }): Promise<User> {
+  //   const hashedPassword = await this.passwordService.hashPassword(
+  //     data.password,
+  //   );
+  //   const encryptedEmail = await this.encryptUserEmail(data.email);
+  //   const defaultUsername =
+  //     data.username ||
+  //     this.encryptionService.extractUsernameFromEmail(data.email);
+
+  //   const newUser = this.usersRepository.create({
+  //     email: encryptedEmail,
+  //     password: hashedPassword,
+  //     username: defaultUsername,
+  //     role: 'user',
+  //   });
+
+  //   return this.usersRepository.save(newUser);
+  // }
+
+  async findAll(): Promise<User[]> {
+    const users = await this.usersRepository.find();
+    return Promise.all(
+      users.map(async (user) => ({
+        ...user,
+        email: await this.decryptUserEmail(user.email),
+      })),
+    );
+  }
+
+  async findOne(id: number): Promise<User> {
+    const user = await this.usersRepository.findOneBy({ id });
+    // if (user) {
+    //   user.email = await this.decryptUserEmail(user.email);
+    // }
+    return user;
+  }
+
+  // email은 암호화 되어 있음
   async findByEmail(email: string): Promise<User | null> {
-    // 이메일로 사용자 찾기
-    return this.usersRepository.findOneBy({ email });
+    // 복호화 후 이메일로 사용자 조회하기
+    const user = await this.usersRepository.findOneBy({
+      email,
+    });
+    // if (user) {
+    //   user.email = email; // Return the original unencrypted email
+    // }
+    return user;
   }
 
   async findByUsername(username: string): Promise<User | null> {
-    // 유저 이름으로 사용자 찾기
-    return this.usersRepository.findOneBy({ username });
+    const user = await this.usersRepository.findOneBy({ username });
+    if (user) {
+      user.email = await this.decryptUserEmail(user.email);
+    }
+    return user;
   }
 
   async createOauthUser(data: {
-    email: string;
+    email: string; // This must be already encrypted by the OAuth service
     username: string;
     oauthProvider: string;
   }): Promise<User> {
-    // OAuth 사용자 생성
     const newUser = this.usersRepository.create({
-      email: data.email,
+      email: data.email, // Use the already encrypted email
       username: data.username,
       oauth_provider: data.oauthProvider,
       role: 'user',
     });
 
-    return this.usersRepository.save(newUser);
+    const savedUser = await this.usersRepository.save(newUser);
+    console.log('savedUser', savedUser);
+
+    // Decrypt email before returning
+    // savedUser.email = await this.decryptUserEmail(savedUser.email);
+    return savedUser;
   }
 
   // 사용자의 답변 조회 메서드
@@ -66,11 +125,32 @@ export class UsersService {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
 
+    // If password is being updated, hash it
+    if (updateData.password) {
+      updateData.password = await this.passwordService.hashPassword(
+        updateData.password,
+      );
+    }
+
+    // If email is being updated, encrypt it and update username if not provided
+    if (updateData.email) {
+      updateData.email = await this.encryptUserEmail(updateData.email);
+      if (!updateData.username) {
+        updateData.username = this.encryptionService.extractUsernameFromEmail(
+          await this.decryptUserEmail(updateData.email),
+        );
+      }
+    }
+
     // 업데이트할 데이터가 존재하면 할당
     Object.assign(user, updateData);
 
-    // 업데이트된 사용자 저장
-    return this.usersRepository.save(user);
+    // Save the user with encrypted email
+    const savedUser = await this.usersRepository.save(user);
+
+    // Decrypt email before returning
+    savedUser.email = await this.decryptUserEmail(savedUser.email);
+    return savedUser;
   }
 
   async updateUsername(userId: number, newUsername: string): Promise<void> {
