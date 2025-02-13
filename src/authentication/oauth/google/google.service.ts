@@ -2,14 +2,22 @@
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '@/users/users.service';
 import { ProfileProps } from './dto/google.auth.type';
+import { EncryptionService } from '../../encryption/encryption.service';
 
 @Injectable()
 export class GoogleService {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly encryptionService: EncryptionService,
+  ) {}
 
   // 구글에 대한 로그인 처리
   async handleGoogleLogin(profile: ProfileProps) {
-    const { email, username } = profile;
+    const { email } = profile;
+    // console.log('emil', email);
+    const username =
+      profile.username ||
+      this.encryptionService.extractUsernameFromEmail(email);
 
     // 이미 가입된 유저인지 판별
     let user = await this.usersService.findByEmail(email);
@@ -32,8 +40,9 @@ export class GoogleService {
 
     // user생성하면서 profile도 같이 생성해야함
     if (!user) {
+      const encryptedEmail = await this.encryptionService.encrypt(email);
       user = await this.usersService.createOauthUser({
-        email,
+        email: encryptedEmail,
         username,
         oauthProvider: 'google',
       });

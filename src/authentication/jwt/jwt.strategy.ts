@@ -50,6 +50,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       );
     }
 
+    // console.log('payload: \n', payload);
+
     // 사용자 정보 조회 (DB 조회 등)
     const user = await this.usersService.findOne(payload.userId);
     if (!user) {
@@ -58,6 +60,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     if (user.email !== payload.email) {
       throw new UnauthorizedException('Token email does not match user email.');
     }
+    // console.log('success');
 
     // request.user에 필요한 정보를 반환
     return { userId: user.id, email: user.email, username: user.username };

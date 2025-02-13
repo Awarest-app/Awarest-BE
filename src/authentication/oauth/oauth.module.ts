@@ -12,12 +12,15 @@ import { AppleController } from './apple/apple.controller';
 import { AppleStrategy } from './apple/apple.strategy';
 import { AppleService } from './apple/apple.service';
 import { JwtService } from '@nestjs/jwt';
+import { EncryptionModule } from '../encryption/encryption.module';
+import { EncryptionService } from '../encryption/encryption.service';
 
 @Module({
   imports: [
     UsersModule,
     AuthModule,
     SurveyModule,
+    EncryptionModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
   ],
   controllers: [GoogleController, AppleController],
@@ -28,6 +31,7 @@ import { JwtService } from '@nestjs/jwt';
     JwtStrategy,
     AppleStrategy,
     AppleService,
+    EncryptionService,
   ],
 })
 export class OauthModule {}

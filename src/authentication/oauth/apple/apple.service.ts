@@ -2,18 +2,21 @@
 import { Injectable } from '@nestjs/common';
 import { UsersService } from '@/users/users.service';
 import { ProfileProps } from '../google/dto/google.auth.type';
+import { EncryptionService } from '../../encryption/encryption.service';
 
 @Injectable()
 export class AppleService {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly encryptionService: EncryptionService,
+  ) {}
 
   async handleAppleLogin(profile: ProfileProps) {
     console.log('Callback user data: inner profile', profile);
     const { email } = profile;
-
-    console.log('Callback user data: inner username', email);
-    const username = email.split('@')[0];
-    console.log('Callback user data: inner username', username);
+    const username =
+      profile.username ||
+      this.encryptionService.extractUsernameFromEmail(email);
 
     // 이메일을 기준으로 이미 가입된 사용자 확인
     let user = await this.usersService.findByEmail(email);
@@ -33,11 +36,14 @@ export class AppleService {
     }
 
     // 가입된 사용자가 없다면 OAuth 회원가입 진행
+    const encryptedEmail = await this.encryptionService.encrypt(email);
     user = await this.usersService.createOauthUser({
-      email,
+      email: encryptedEmail,
       username,
       oauthProvider: 'apple',
     });
+    // Decrypt email before returning
+    user.email = email;
 
     return user;
   }
