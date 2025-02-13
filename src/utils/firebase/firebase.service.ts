@@ -1,13 +1,20 @@
 import * as admin from 'firebase-admin';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import * as fs from 'fs';
+import { join } from 'path';
 
 @Injectable()
 export class FirebaseService implements OnModuleInit {
   onModuleInit() {
     if (!admin.apps.length) {
+      // const serviceAccount = JSON.parse(
+      //   fs.readFileSync('../../../config/firebase-adminsdk.json', 'utf8'),
+      // );
       const serviceAccount = JSON.parse(
-        fs.readFileSync('../../../config/firebase-adminsdk.json', 'utf8'),
+        fs.readFileSync(
+          join(process.cwd(), 'config', 'firebase-adminsdk.json'),
+          'utf8',
+        ),
       );
 
       admin.initializeApp({

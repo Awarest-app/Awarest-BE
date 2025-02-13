@@ -21,6 +21,7 @@ import { AnswersModule } from './answer/answers.module';
 import { UserQuestionModule } from './userQuestion/userQuestion.module';
 import { RedisModule } from './redis/redis.module';
 import { ProfileModule } from './profile/profile.module';
+import { NotificationModule } from './utils/alarm/notification.module';
 import * as path from 'path';
 
 @Module({
@@ -57,6 +58,7 @@ import * as path from 'path';
     UserQuestionModule,
     AnswersModule,
     ProfileModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [

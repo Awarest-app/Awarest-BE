@@ -90,4 +90,15 @@ export class ProfileService {
     profile.username = newUsername;
     await this.profileRepository.save(profile);
   }
+
+  async updateDeviceToken(userId: number, deviceToken: string): Promise<void> {
+    const profile = await this.profileRepository.findOne({ where: { userId } });
+
+    if (!profile) {
+      throw new NotFoundException('사용자의 프로필을 찾을 수 없습니다.');
+    }
+
+    profile.deviceToken = deviceToken;
+    await this.profileRepository.save(profile);
+  }
 }

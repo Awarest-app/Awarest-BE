@@ -69,4 +69,21 @@ export class ProfileController {
 
     return { message: '사용자명이 성공적으로 변경되었습니다.' };
   }
+
+  @Post('device-token')
+  async updateDeviceToken(
+    @Req() request: jwtRequest,
+    @Body() body: { deviceToken: string },
+  ) {
+    const user = request.user;
+    const { deviceToken } = body;
+
+    if (!deviceToken || deviceToken.trim() === '') {
+      throw new BadRequestException('디바이스 토큰이 필요합니다.');
+    }
+
+    await this.profileService.updateDeviceToken(user.userId, deviceToken);
+
+    return { message: '디바이스 토큰이 업데이트되었습니다.' };
+  }
 }
