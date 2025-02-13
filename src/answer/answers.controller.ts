@@ -2,20 +2,29 @@
 
 import {
   Controller,
+  Get,
   Put,
   Delete,
   Param,
   Body,
   ParseIntPipe,
+  Req,
   HttpCode,
 } from '@nestjs/common';
 import { AnswersService } from './answers.service';
 import { Answer } from '../entities/answer.entity';
-// import { jwtRequest } from '@/type/request.interface';
+import { jwtRequest } from '@/type/request.interface';
 
 @Controller('api/answers')
 export class AnswersController {
   constructor(private readonly answersService: AnswersService) {}
+
+  // 사용자의 모든 답변 조회 -> 버전업하고 변경
+  @Get('me')
+  async getAnswersByUser(@Req() request: jwtRequest): Promise<any> {
+    const user = request.user as { userId: number; email: string };
+    return this.answersService.getAnswersByUserOrdered(user.userId);
+  }
 
   // 답변 업데이트
   @Put('/update/:id')

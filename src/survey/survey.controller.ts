@@ -1,15 +1,7 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Get,
-  Req,
-  HttpException,
-  HttpStatus,
-} from '@nestjs/common';
+import { Controller, Post, Body, Get, Req } from '@nestjs/common';
 import { SurveyService } from './survey.service';
 import { jwtRequest } from '@/type/request.interface';
-import { UserSurvey } from '@/type/survey.type';
+import { UserSurvey } from './dto/survey.dto';
 
 @Controller('api/survey')
 export class SurveyController {
@@ -19,7 +11,6 @@ export class SurveyController {
   @Get('user')
   async findByUser(@Req() request: jwtRequest) {
     const user = request.user;
-    console.log('private survey user :\n', user);
     return this.surveyService.checkSurveyStatus(user.userId);
   }
 
@@ -30,19 +21,10 @@ export class SurveyController {
     @Body() body: { answers: UserSurvey },
   ) {
     const user = request.user;
-    console.log('survey user  : ', user);
-    console.log('survey body  : ', body);
-    try {
-      await this.surveyService.saveSurveyResults(user.userId, body.answers);
-      return {
-        message: 'Survey results saved successfully',
-      };
-    } catch (error) {
-      console.error('Error saving survey results:', error);
-      throw new HttpException(
-        'Failed to save survey results',
-        HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
+    await this.surveyService.saveSurveyResults(user.userId, body.answers);
+
+    return {
+      message: 'Survey results saved successfully',
+    };
   }
 }
