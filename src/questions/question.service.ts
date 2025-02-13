@@ -68,9 +68,11 @@ export class QuestionService {
 
     // 1) Redis에서 기존 세트 조회
     const data = await client.get(redisKey);
+    // console.log('data', data);
     if (data) {
       // Redis에 데이터가 있을 경우
       const parsed = JSON.parse(data);
+      console.log('parsed', parsed);
 
       // 1-1) 날짜가 "오늘"과 같다면 그대로 반환
       if (parsed.date === todayStr) {
@@ -78,11 +80,12 @@ export class QuestionService {
       }
 
       // 1-2) 날짜가 달라졌다면 (이미 어제가 됨)
-      //      -> "안 쓴 질문"(answered=false)을 가져와서 새로 3개를 만들고, Redis 갱신
+      //  -> "안 쓴 질문"(answered=false)을 가져와서 새로 3개를 만들고, Redis 갱신
       const leftover = parsed.questions.filter((q) => q.answered === false);
 
       // leftover questionId 배열
       const leftoverIds = leftover.map((q) => q.questionId);
+      console.log('leftoverIds', leftoverIds);
 
       // 새로 뽑아야 할 질문 개수
       const neededCount = 3 - leftover.length;
@@ -158,94 +161,6 @@ export class QuestionService {
       updatedAt: new Date(),
     });
   }
-
-  /**
-   * leftover를 제외한 새 질문 neededCount개 뽑아서 questionId 배열로 반환
-   * 실제 질문 로직(가중치 기반)은 아래에서 재활용
-   */
-  // private async getNewQuestionIds(
-  //   userId: number,
-  //   excludeQuestionIds: number[],
-  //   neededCount: number,
-  // ): Promise<number[]> {
-  //   if (neededCount <= 0) return [];
-
-  //   // (기존에 작성하셨던 가중치 로직)
-  //   // 1) 사용자 설문 정보 가져오기
-  //   const survey = await this.surveyRepo.findOne({ where: { userId } });
-  //   if (!survey) {
-  //     return [];
-  //   }
-  //   const orConditions = [];
-  //   if (survey.ageRange) {
-  //     orConditions.push({
-  //       categoryName: 'age_range',
-  //       categoryValue: survey.ageRange,
-  //     });
-  //   }
-  //   if (survey.job) {
-  //     orConditions.push({ categoryName: 'job', categoryValue: survey.job });
-  //   }
-  //   if (survey.goal) {
-  //     orConditions.push({ categoryName: 'goal', categoryValue: survey.goal });
-  //   }
-  //   if (orConditions.length === 0) {
-  //     return [];
-  //   }
-
-  //   // 2) question_mapping에서 조건에 맞는 레코드 검색
-  //   const mappings = await this.questionMapRepo.find({ where: orConditions });
-
-  //   // 3) 이미 유저가 DB 상에서 사용한 적 있는 questionId도 제외
-  //   const userQuestions = await this.userQuestionRepo.find({
-  //     where: { userId },
-  //   });
-  //   const userQuestionIds = userQuestions.map((uq) => uq.questionId);
-
-  //   // 4) excludeQuestionIds( leftover ) + userQuestionIds 를 전부 제외
-  //   const allExcluded = new Set([...excludeQuestionIds, ...userQuestionIds]);
-
-  //   const filteredMappings = mappings.filter(
-  //     (map) => !allExcluded.has(map.questionId),
-  //   );
-
-  //   // 5) questionId별로 가중치 합산
-  //   const weightMap: Record<number, number> = {};
-  //   for (const map of filteredMappings) {
-  //     if (!weightMap[map.questionId]) {
-  //       weightMap[map.questionId] = 0;
-  //     }
-  //     weightMap[map.questionId] += map.weight;
-  //   }
-
-  //   // 6) 가중치가 부여된 questionId 들만
-  //   const questionIds = Object.keys(weightMap).map(Number);
-  //   if (questionIds.length === 0) {
-  //     return [];
-  //   }
-
-  //   // 실제 Question 테이블에 있는지 확인
-  //   const questions = await this.questionRepo.findByIds(questionIds);
-  //   // 질문이 존재하는 questionIds만
-  //   const validQuestionIds = questions.map((q) => q.questionId);
-
-  //   // 7) 가중치 내림차순 정렬
-  //   validQuestionIds.sort((a, b) => weightMap[b] - weightMap[a]);
-
-  //   // 8) neededCount만큼 잘라서 반환
-  //   return validQuestionIds.slice(0, neededCount);
-  // }
-
-  // async getQuestionsByIds(questionIds: number[]): Promise<Question[]> {
-  //   if (questionIds.length === 0) return [];
-
-  //   // In 연산자를 사용하여 주어진 ID 배열에 해당하는 엔티티를 검색
-  //   const questions = await this.questionRepo.findBy({
-  //     questionId: In(questionIds),
-  //   });
-
-  //   return questions;
-  // }
 
   private async getNewQuestionIds(
     userId: number,
@@ -364,25 +279,87 @@ export class QuestionService {
     return questions;
   }
 
-  // /**
-  //  * 여러 개의 답변을 생성 및 저장
-  //  * @param userId 사용자 ID
-  //  * @param answersData 답변 데이터 배열
-  //  */
-  // async createAnswers(
-  //   userId: number,
-  //   answersData: Partial<Answer>[],
-  // ): Promise<Answer[]> {
-  //   const answers = answersData.map((item) => {
-  //     return this.answerRepo.create({
-  //       subquestionId: item.subquestionId,
-  //       content: (item as any).answer, // 'answer'를 'content'로 매핑
-  //       userId,
-  //     });
-  //   });
+  async getAnswersByUserOrdered(userId: number): Promise<
+    {
+      question: string;
+      subquestions: { text: string; answer: string; date: Date; id: number }[];
+    }[]
+  > {
+    // 1. 사용자에 해당하는 모든 answer를 조회하면서
+    //    subquestion, subquestion.question 관계를 함께 로드
+    const answers = await this.answerRepo.find({
+      where: { userId },
+      relations: ['subquestion', 'subquestion.question'],
+    });
 
-  //   return this.answerRepo.save(answers);
-  // }
+    console.log('answers:', answers);
+
+    if (!answers.length) {
+      return [];
+      // throw new NotFoundException(`No answers found for userId=${userId}`);
+    }
+
+    // 2. 질문(question)별로 답변을 그룹화하기 위한 자료구조
+    //    key: questionId, value: { question: string, subquestions: [...], lastSubmittedAt: Date }
+    const questionMap = new Map<
+      number,
+      {
+        question: string;
+        subquestions: {
+          text: string;
+          answer: string;
+          date: Date;
+          id: number;
+        }[];
+        lastSubmittedAt: Date; // 가장 최근 답변 시간
+      }
+    >();
+
+    for (const ans of answers) {
+      const subq = ans.subquestion;
+      const q = subq.question; // question entity
+
+      // questionId를 기준으로 그룹이 없다면 초기화
+      if (!questionMap.has(q.questionId)) {
+        questionMap.set(q.questionId, {
+          question: q.content,
+          subquestions: [],
+          lastSubmittedAt: ans.submittedAt,
+        });
+      }
+
+      const group = questionMap.get(q.questionId);
+
+      // subquestion 배열에 현재 답변 정보 푸시
+      group.subquestions.push({
+        text: subq.content,
+        answer: ans.content,
+        date: ans.submittedAt,
+        id: ans.subquestionId,
+      });
+
+      // 가장 최근에 답변한 시각 갱신
+      if (ans.submittedAt > group.lastSubmittedAt) {
+        group.lastSubmittedAt = ans.submittedAt;
+      }
+    }
+    // console.log('questionMap:', questionMap);
+
+    // 3. Map을 배열로 변환하고 "가장 최근 답변 시각" 기준으로 정렬
+    const result = Array.from(questionMap.values())
+      .sort((a, b) => b.lastSubmittedAt.getTime() - a.lastSubmittedAt.getTime())
+      .map((item) => ({
+        question: item.question,
+        subquestions: item.subquestions.map((sub) => ({
+          text: sub.text,
+          answer: sub.answer,
+          date: sub.date,
+          id: sub.id,
+        })),
+      }));
+
+    return result;
+  }
 
   /**
    * 여러 개의 답변을 생성 및 저장

@@ -11,7 +11,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     this.client = new Redis({
       host: process.env.REDIS_HOST, // docker-compose 기준 'redis'를 호스트로
       port: Number(process.env.REDIS_PORT),
-      // password: process.env.REDIS_PASSWORD, // 필요하다면 추가
+      password: process.env.REDIS_PASSWORD, // 필요하다면 추가
     });
   }
 

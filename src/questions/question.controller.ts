@@ -2,6 +2,7 @@
 import { Controller, Get, Post, Body, Req, Put } from '@nestjs/common';
 import { QuestionService } from './question.service';
 import { jwtRequest } from '@/type/request.interface';
+import { QuestionHistoryDto } from './dto/question.dto';
 
 @Controller('api/questions')
 export class QuestionController {
@@ -58,6 +59,15 @@ export class QuestionController {
 
     console.log('xpToAdd', xpToAdd);
     return { success: true, xpAdded: xpToAdd };
+  }
+
+  // history 가져오기
+  @Get('history')
+  async getQuestionHistory(
+    @Req() request: jwtRequest,
+  ): Promise<QuestionHistoryDto[]> {
+    const user = request.user as { userId: number; email: string };
+    return this.questionService.getAnswersByUserOrdered(user.userId);
   }
 
   // @Public()

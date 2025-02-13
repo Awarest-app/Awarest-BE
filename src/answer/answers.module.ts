@@ -3,8 +3,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Answer } from '../entities/answer.entity';
-// import { AnswersService } from './answers.service';
-// import { AnswersController } from './answers.controller';
 import { Subquestion } from '../entities/subquestion.entity';
 import { User } from '../entities/user.entity';
 import { Question } from '../entities/question.entity';
