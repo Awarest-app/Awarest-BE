@@ -66,10 +66,10 @@ export class UsersService {
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    // Encrypt the email for comparison
-    const encryptedEmail = await this.encryptUserEmail(email);
+    // 복호화 후 이메일로 사용자 조회하기
+    // const encryptedEmail = await this.encryptUserEmail(email);
     const user = await this.usersRepository.findOneBy({
-      email: encryptedEmail,
+      email,
     });
     // if (user) {
     //   user.email = email; // Return the original unencrypted email
