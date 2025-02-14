@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { FirebaseService } from '../firebase/firebase.service';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, LessThan } from 'typeorm';
 import { Question } from '@/entities/question.entity';
 import { Profile } from '@/entities/profile.entity';
 import { UserQuestion } from '@/entities/user-question.entity';
@@ -95,6 +95,33 @@ export class NotificationService {
         '저녁 질문',
         message,
       );
+    }
+  }
+
+  @Cron('0 0 0 * * *') // Every day at mi  dnight
+  // @Cron('0 * * * * *') // Every minute
+  async checkAndResetStreaks() {
+    const twoDaysAgo = new Date();
+    console.log('twoDaysAgo:', twoDaysAgo);
+
+    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+    twoDaysAgo.setHours(0, 0, 0, 0);
+    console.log('twoDaysAgo:', twoDaysAgo);
+
+    // const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000);
+    // console.log('twoMinutesAgo:', twoMinutesAgo);
+
+    // Find all profiles where lastStreakDate is older than 2 days
+    const profiles = await this.profileRepository.find({
+      where: {
+        lastStreakDate: LessThan(twoDaysAgo),
+      },
+    });
+
+    // Reset day_streak to 0 for these profiles
+    for (const profile of profiles) {
+      profile.day_streak = 0;
+      await this.profileRepository.save(profile);
     }
   }
 }
