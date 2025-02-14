@@ -2,7 +2,7 @@ import { FirebaseService } from '@/utils/firebase/firebase.service';
 import { Controller, Post, Body } from '@nestjs/common';
 // import { FirebaseService } from './firebase.service';
 
-@Controller('notifications')
+@Controller('api/notifications')
 export class NotificationController {
   constructor(private readonly firebaseService: FirebaseService) {}
 

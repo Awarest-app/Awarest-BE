@@ -470,26 +470,27 @@ export class QuestionService {
         if (!profile) {
           throw new BadRequestException('사용자의 프로필을 찾을 수 없습니다.');
         }
-        console.log('redis1-1');
+        // console.log('redis1-1');
 
         const today = new Date();
         const lastStreakDate = profile.lastStreakDate
           ? new Date(profile.lastStreakDate)
           : null;
 
-        console.log('redis1-3');
+        // console.log('redis1-3');
         const isSameDay =
           lastStreakDate &&
           lastStreakDate.toDateString() === today.toDateString();
 
-        console.log('redis2');
+        // console.log('redis2');
         if (!isSameDay) {
           // day_streak 증가 및 lastStreakDate 업데이트
           profile.day_streak += 1;
           profile.lastStreakDate = today;
           await manager.save(profile);
         }
-        console.log('redis3');
+
+        // console.log('redis3');
         // 제출된 답변을 DB에 저장
         const answerEntities = answersData.map((a) => {
           return this.answerRepo.create({

@@ -14,13 +14,21 @@ export class GoogleService {
   // 구글에 대한 로그인 처리
   async handleGoogleLogin(profile: ProfileProps) {
     const { email } = profile;
-    // console.log('emil', email);
+
+    // console.log(
+    //   'test',
+    //   this.encryptionService.decrypt(
+    //     '+8Whz4oIUZGrKPg9NwEJG7x442fny0gq6jZkmmjk4RDNfLGpUJbsYbJ7RCgTwrlX',
+    //   ),
+    // );
+
     const username =
       profile.username ||
       this.encryptionService.extractUsernameFromEmail(email);
 
     const encryptedEmail = await this.encryptionService.encrypt(email);
     // 이미 가입된 유저인지 판별
+
     let user = await this.usersService.findByEmail(encryptedEmail);
 
     if (user) {
