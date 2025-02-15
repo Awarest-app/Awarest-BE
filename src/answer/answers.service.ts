@@ -101,7 +101,7 @@ export class AnswersService {
       relations: ['subquestion', 'subquestion.question'],
     });
 
-    console.log('answers:', answers);
+    // console.log('answers:', answers);
 
     if (!answers.length) {
       return [];

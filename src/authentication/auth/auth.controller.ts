@@ -119,7 +119,7 @@ export class AuthController {
         );
       }
 
-      console.log('delete user', user);
+      // console.log('delete user', user);
       // // 리프레시 토큰 폐기
       // await this.authService.revokeRefreshToken(user.id);
 
@@ -158,7 +158,7 @@ export class AuthController {
 
     // 저장된 해시된 비밀번호와 비교 (bcrypt 사용)
     // const passwordValid = await bcrypt.compare(password, user.password);
-    console.log('user.password, password', user.password, password);
+    // console.log('user.password, password', user.password, password);
     if (user.password !== password) {
       throw new HttpException(
         '유효하지 않은 비밀번호입니다.',
@@ -225,7 +225,7 @@ export class AuthController {
     // mobile
     if (req.headers && req.headers['x-refresh-token']) {
       refreshToken = req.headers['x-refresh-token'] as string;
-      console.log('refreshToken (from x-refresh-token):', refreshToken);
+      // console.log('refreshToken (from x-refresh-token):', refreshToken);
     }
 
     // admin (web)

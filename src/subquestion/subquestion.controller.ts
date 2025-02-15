@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { SubquestionService } from './subquestion.service';
 import { jwtRequest } from '@/type/request.interface';
-import { IQuestionProps } from '@/questions/dto/question.dto';
+// import { IQuestionProps } from '@/questions/dto/question.dto';
 // import { CreateSubquestionDto, UpdateSubquestionDto } from './dto';
 
 @Controller('api/subquestions')
@@ -29,7 +29,7 @@ export class SubquestionController {
   @Get(':id')
   async findOne(@Req() request: jwtRequest, @Param('id') id: number) {
     // 여기서 queryid 는 questionId 입니다.
-    console.log('subquestion.controller.ts: request.user', id);
+    // console.log('subquestion.controller.ts: request.user', id);
 
     // userId와 questionId를 이용해서 subquestion을 가져옵니다.
     // ★ 여기서 await 추가
@@ -42,7 +42,7 @@ export class SubquestionController {
 
   @Put('admin/update/:id')
   async update(@Param('id') id: number, @Body() body: { content: string }) {
-    console.log('subquestion.controller.ts: update', id, body.content);
+    // console.log('subquestion.controller.ts: update', id, body.content);
     return this.subqService.update(id, body.content);
   }
 

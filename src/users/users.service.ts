@@ -98,7 +98,7 @@ export class UsersService {
     });
 
     const savedUser = await this.usersRepository.save(newUser);
-    console.log('savedUser', savedUser);
+    // console.log('savedUser', savedUser);
 
     // Decrypt email before returning
     // savedUser.email = await this.decryptUserEmail(savedUser.email);
@@ -109,7 +109,7 @@ export class UsersService {
   async getUserAnswers(userId: number): Promise<Answer[]> {
     // 사용자 존재 확인
     const user = await this.findOne(userId);
-    console.log('user', user);
+    // console.log('user', user);
 
     // 해당 사용자의 답변 조회
     return this.answerRepository.find({

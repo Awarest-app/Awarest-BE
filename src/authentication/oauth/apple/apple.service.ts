@@ -12,7 +12,7 @@ export class AppleService {
   ) {}
 
   async handleAppleLogin(profile: ProfileProps) {
-    console.log('Callback user data: inner profile', profile);
+    // console.log('Callback user data: inner profile', profile);
     const { email } = profile;
     const username =
       profile.username ||

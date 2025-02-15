@@ -53,14 +53,14 @@ export class QuestionController {
   ) {
     const user = request.user as { userId: number; email: string };
     const userId = user.userId;
-    console.log('\n  updateAnswers', body.answers, body.questionName);
+    // console.log('\n  updateAnswers', body.answers, body.questionName);
     const xpToAdd = await this.questionService.submitAnswers(
       userId,
       body.answers,
       body.questionName,
     );
 
-    console.log('xpToAdd', xpToAdd);
+    // console.log('xpToAdd', xpToAdd);
     return { success: true, xpAdded: xpToAdd };
   }
 

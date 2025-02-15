@@ -98,8 +98,9 @@ export class NotificationService {
     }
   }
 
-  @Cron('0 0 0 * * *') // Every day at mi  dnight
+  // day_streak를 2틀이 지나면 0으로 초기화
   // @Cron('0 * * * * *') // Every minute
+  @Cron('0 0 0 * * *') // Every day at mi  dnight
   async checkAndResetStreaks() {
     const twoDaysAgo = new Date();
     console.log('twoDaysAgo:', twoDaysAgo);
