@@ -129,6 +129,7 @@ export class QuestionManagementService {
     }
 
     console.log('categoryOptions');
+
     // 각 카테고리별 옵션 설정
     const categoryOptions = [
       { categoryName: 'age', options: ageGroups },
@@ -144,11 +145,11 @@ export class QuestionManagementService {
           categoryValue: option,
           weight: 5,
           questionId: savedQuestion.questionId,
-          // depth: String(depth),
+          depth: String(depth),
         }),
       ),
     );
-
+    console.log('mappings', mappings);
     // 생성된 모든 mapping 저장
     await this.questionMappingRepo.save(mappings);
 
