@@ -25,6 +25,9 @@ export class AppleService {
 
     if (user) {
       // 이미 등록된 이메일 유저면 동일 인물로 판단
+      if (user.deleted_at) {
+        await this.usersService.restoreUser(user.id);
+      }
       return user;
     }
 

@@ -103,7 +103,6 @@ export class QuestionManagementService {
     depth: number,
   ): Promise<Question> {
     // 1. 질문 저장
-    console.log('inner createQuestion', questionContent, subquestions, depth);
     const question = this.questionRepo.create({
       content: questionContent,
       depth: depth,
@@ -112,10 +111,15 @@ export class QuestionManagementService {
 
     // 2. subquestion들을 순서(order)를 부여하면서 저장
     for (let i = 0; i < subquestions.length; i++) {
+      if (subquestions[i] == null) {
+        console.warn(
+          `Subquestion at index ${i} is null or undefined. Skipping...`,
+        );
+        continue;
+      }
       const subq = this.subQuestionRepo.create({
-        questionId: savedQuestion.questionId, // FK 연결
+        questionId: savedQuestion.questionId,
         content: subquestions[i],
-        // order: i + 1, // 순번 부여 (1부터 시작)
       });
       await this.subQuestionRepo.save(subq);
     }

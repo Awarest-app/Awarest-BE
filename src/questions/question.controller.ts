@@ -99,7 +99,6 @@ export class QuestionController {
   @Post('/admin/create')
   async createNewQuestion(@Body() body: { content: IQuestionProps }) {
     // const { question_content, subquestion, depth } = body.content;
-
     const savedQuestion = await this.questionService.createQuestion(
       body.content,
     );
