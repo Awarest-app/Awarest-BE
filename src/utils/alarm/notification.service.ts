@@ -54,7 +54,8 @@ export class NotificationService {
     return query.getOne();
   }
 
-  @Cron('0 0 7 * * *') // Every day at 7:00 AM
+  // @Cron('0 0 7 * * *') // Every day at 7:00 AM
+  @Cron('0 * * * * *') // Every minutex
   async sendMorningNotification() {
     const profiles = await this.profileRepository.find({
       where: { noti: true }, // Only send to users who enabled notifications
@@ -68,6 +69,7 @@ export class NotificationService {
         ? randomQuestion.content
         : this.getRandomMessage();
 
+      console.log('message', message);
       await this.firebaseService.sendPushNotification(
         profile.deviceToken,
         '오늘의 질문',
@@ -99,18 +101,11 @@ export class NotificationService {
   }
 
   // day_streak를 2틀이 지나면 0으로 초기화
-  // @Cron('0 * * * * *') // Every minute
-  @Cron('0 0 0 * * *') // Every day at mi  dnight
+  @Cron('0 0 0 * * *') // Every day at midnight
   async checkAndResetStreaks() {
     const twoDaysAgo = new Date();
-    console.log('twoDaysAgo:', twoDaysAgo);
-
     twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
     twoDaysAgo.setHours(0, 0, 0, 0);
-    console.log('twoDaysAgo:', twoDaysAgo);
-
-    // const twoMinutesAgo = new Date(Date.now() - 2 * 60 * 1000);
-    // console.log('twoMinutesAgo:', twoMinutesAgo);
 
     // Find all profiles where lastStreakDate is older than 2 days
     const profiles = await this.profileRepository.find({
@@ -123,6 +118,35 @@ export class NotificationService {
     for (const profile of profiles) {
       profile.day_streak = 0;
       await this.profileRepository.save(profile);
+    }
+  }
+
+  /**
+   * 사용자의 디바이스 토큰을 업데이트하는 함수
+   * @param userId 사용자 ID
+   * @param deviceToken 새로운 디바이스 토큰
+   */
+  async updateDeviceToken(userId: number, deviceToken: string): Promise<void> {
+    const profile = await this.profileRepository.findOne({ where: { userId } });
+
+    if (profile) {
+      // 프로필이 존재하면 디바이스 토큰 업데이트
+      profile.deviceToken = deviceToken;
+      await this.profileRepository.save(profile);
+    } else {
+      // 프로필이 없으면 새로 생성
+      const newProfile = this.profileRepository.create({
+        userId,
+        deviceToken,
+        day_streak: 0,
+        total_xp: 0,
+        level: 1,
+        total_answers: 0,
+        achievements: 0,
+        joined_date: new Date(),
+        noti: true, // 토큰을 등록하면 알림을 활성화로 설정
+      });
+      await this.profileRepository.save(newProfile);
     }
   }
 }

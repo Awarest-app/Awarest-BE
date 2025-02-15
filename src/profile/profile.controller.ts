@@ -25,7 +25,7 @@ export class ProfileController {
     @Body() body: { permissons: boolean },
   ) {
     const user = request.user;
-    // console.log('user', user);
+    console.log('user premission', body.permissons);
     return this.profileService.setNotification(
       user.userId,
       user.username,
