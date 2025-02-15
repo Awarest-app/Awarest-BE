@@ -32,8 +32,8 @@ export class FirebaseService implements OnModuleInit {
     };
 
     try {
-      const response = await admin.messaging().send(message);
-      console.log('푸시 알림 전송 성공:', response);
+      await admin.messaging().send(message);
+      // console.log('푸시 알림 전송 성공:', response);
     } catch (error) {
       console.error('푸시 알림 전송 실패:', error);
     }

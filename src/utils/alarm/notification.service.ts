@@ -9,11 +9,11 @@ import { UserQuestion } from '@/entities/user-question.entity';
 
 @Injectable()
 export class NotificationService {
-  private readonly predefinedMessages = [
-    '오늘의 질문이 도착했어요! 지금 확인해보세요.',
-    '새로운 질문이 기다리고 있어요. 함께 생각해볼까요?',
-    '오늘도 성장하는 하루 되세요! 새로운 질문이 도착했습니다.',
-  ];
+  // private readonly predefinedMessages = [
+  //   '오늘의 질문이 도착했어요! 지금 확인해보세요.',
+  //   '새로운 질문이 기다리고 있어요. 함께 생각해볼까요?',
+  //   '오늘도 성장하는 하루 되세요! 새로운 질문이 도착했습니다.',
+  // ];
 
   constructor(
     private readonly firebaseService: FirebaseService,
@@ -25,12 +25,12 @@ export class NotificationService {
     private readonly userQuestionRepository: Repository<UserQuestion>,
   ) {}
 
-  private getRandomMessage(): string {
-    const randomIndex = Math.floor(
-      Math.random() * this.predefinedMessages.length,
-    );
-    return this.predefinedMessages[randomIndex];
-  }
+  // private getRandomMessage(): string {
+  //   const randomIndex = Math.floor(
+  //     Math.random() * this.predefinedMessages.length,
+  //   );
+  //   return this.predefinedMessages[randomIndex];
+  // }
 
   private async getRandomUnansweredQuestion(
     userId: number,
@@ -46,7 +46,9 @@ export class NotificationService {
     const query = this.questionRepository.createQueryBuilder('question');
 
     if (answeredQuestionIds.length > 0) {
-      query.where('question.id NOT IN (:...ids)', { ids: answeredQuestionIds });
+      query.where('question.question_id NOT IN (:...ids)', {
+        ids: answeredQuestionIds,
+      });
     }
 
     query.orderBy('RANDOM()').take(1);
@@ -54,8 +56,8 @@ export class NotificationService {
     return query.getOne();
   }
 
-  // @Cron('0 0 7 * * *') // Every day at 7:00 AM
-  @Cron('0 * * * * *') // Every minutex
+  // @Cron('*/10 * * * * *') // Every 10 seconds
+  @Cron('0 0 7 * * *') // Every day at 7:00 AM
   async sendMorningNotification() {
     const profiles = await this.profileRepository.find({
       where: { noti: true }, // Only send to users who enabled notifications
@@ -65,11 +67,18 @@ export class NotificationService {
       const randomQuestion = await this.getRandomUnansweredQuestion(
         profile.userId,
       );
-      const message = randomQuestion
-        ? randomQuestion.content
-        : this.getRandomMessage();
 
-      console.log('message', message);
+      // randomQuestion이 없으면 (모든 질문 완료) 해당 사용자에게 알림을 보내지 않음
+      if (!randomQuestion) {
+        console.log(
+          `User ${profile.userId} has completed all questions. Skipping notification.`,
+        );
+        continue;
+      }
+
+      const message = randomQuestion.content;
+      // console.log('message', message);
+
       await this.firebaseService.sendPushNotification(
         profile.deviceToken,
         '오늘의 질문',
@@ -88,9 +97,15 @@ export class NotificationService {
       const randomQuestion = await this.getRandomUnansweredQuestion(
         profile.userId,
       );
-      const message = randomQuestion
-        ? randomQuestion.content
-        : this.getRandomMessage();
+
+      // randomQuestion이 없으면 (모든 질문 완료) 해당 사용자에게 알림을 보내지 않음
+      if (!randomQuestion) {
+        console.log(
+          `User ${profile.userId} has completed all questions. Skipping notification.`,
+        );
+        continue;
+      }
+      const message = randomQuestion.content;
 
       await this.firebaseService.sendPushNotification(
         profile.deviceToken,
@@ -128,11 +143,25 @@ export class NotificationService {
    */
   async updateDeviceToken(userId: number, deviceToken: string): Promise<void> {
     const profile = await this.profileRepository.findOne({ where: { userId } });
-    if (!profile) {
-      throw new Error('프로필을 찾을 수 없습니다.');
-    }
 
-    profile.deviceToken = deviceToken;
-    await this.profileRepository.save(profile);
+    if (profile) {
+      // 프로필이 존재하면 디바이스 토큰 업데이트
+      profile.deviceToken = deviceToken;
+      await this.profileRepository.save(profile);
+    } else {
+      // 프로필이 없으면 새로 생성
+      const newProfile = this.profileRepository.create({
+        userId,
+        deviceToken,
+        day_streak: 0,
+        total_xp: 0,
+        level: 1,
+        total_answers: 0,
+        achievements: 0,
+        joined_date: new Date(),
+        noti: true, // 토큰을 등록하면 알림을 활성화로 설정
+      });
+      await this.profileRepository.save(newProfile);
+    }
   }
 }
