@@ -33,7 +33,6 @@ export class SubquestionService {
     const question = await this.questionRepo.findOne({
       where: { questionId }, // question.entity.ts에서 PK가 questionId
     });
-
     if (!question) {
       throw new NotFoundException(`Question with id=${questionId} not found`);
     }
@@ -70,33 +69,33 @@ export class SubquestionService {
     return this.subqRepo.save(subq);
   }
 
-  /**
-   * 새 질문과 해당 subquestion들을 저장합니다.
-   * @param questionContent 질문 내용
-   * @param subquestions subquestion 문자열 배열
-   */
-  async createQuestion(
-    questionContent: string,
-    subquestions: string[],
-    depth: number,
-  ): Promise<Question> {
-    // 1. 질문 저장
-    const question = this.questionRepo.create({
-      content: questionContent,
-      depth: depth,
-    });
-    const savedQuestion = await this.questionRepo.save(question);
+  // /**
+  //  * 새 질문과 해당 subquestion들을 저장합니다.
+  //  * @param questionContent 질문 내용
+  //  * @param subquestions subquestion 문자열 배열
+  //  */
+  // async createQuestion(
+  //   questionContent: string,
+  //   subquestions: string[],
+  //   depth: number,
+  // ): Promise<Question> {
+  //   // 1. 질문 저장
+  //   const question = this.questionRepo.create({
+  //     content: questionContent,
+  //     depth: depth,
+  //   });
+  //   const savedQuestion = await this.questionRepo.save(question);
 
-    // 2. subquestion들을 순서(order)를 부여하면서 저장
-    for (let i = 0; i < subquestions.length; i++) {
-      const subq = this.subqRepo.create({
-        questionId: savedQuestion.questionId, // FK 연결
-        content: subquestions[i],
-        // order: i + 1, // 순번 부여 (1부터 시작)
-      });
-      await this.subqRepo.save(subq);
-    }
+  //   // 2. subquestion들을 순서(order)를 부여하면서 저장
+  //   for (let i = 0; i < subquestions.length; i++) {
+  //     const subq = this.subqRepo.create({
+  //       questionId: savedQuestion.questionId, // FK 연결
+  //       content: subquestions[i],
+  //       // order: i + 1, // 순번 부여 (1부터 시작)
+  //     });
+  //     await this.subqRepo.save(subq);
+  //   }
 
-    return savedQuestion;
-  }
+  //   return savedQuestion;
+  // }
 }

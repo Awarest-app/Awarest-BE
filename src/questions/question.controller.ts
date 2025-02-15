@@ -2,6 +2,7 @@
 import { Controller, Get, Post, Body, Req, Put } from '@nestjs/common';
 import { QuestionService } from './question.service';
 import { jwtRequest } from '@/type/request.interface';
+import { IQuestionProps, QuestionHistoryDto } from './dto/question.dto';
 
 @Controller('api/questions')
 export class QuestionController {
@@ -29,12 +30,15 @@ export class QuestionController {
     // 응답 포맷: QuestionProps 형식으로 변환
     const response = questions.map((question) => ({
       questionId: question.questionId,
-      type: question.type, // Question 엔티티에 'type' 필드가 있다고 가정
-      content: question.content, // Question 엔티티에 'content' 필드가 있다고 가정
+      type: question.type,
+      content: question.content,
     }));
 
     return response;
   }
+
+  // @Post('/answer')
+  // async reloadQuestion() {}
 
   // 2) 특정 질문에 답변 완료 -> 오늘 특정 질문에 대한 답변을 완료했음 ! (Redis에 기록하기)
   @Post('/answer')
@@ -49,15 +53,24 @@ export class QuestionController {
   ) {
     const user = request.user as { userId: number; email: string };
     const userId = user.userId;
-    console.log('\n  updateAnswers', body.answers, body.questionName);
+    // console.log('\n  updateAnswers', body.answers, body.questionName);
     const xpToAdd = await this.questionService.submitAnswers(
       userId,
       body.answers,
       body.questionName,
     );
 
-    console.log('xpToAdd', xpToAdd);
+    // console.log('xpToAdd', xpToAdd);
     return { success: true, xpAdded: xpToAdd };
+  }
+
+  // history 가져오기
+  @Get('history')
+  async getQuestionHistory(
+    @Req() request: jwtRequest,
+  ): Promise<QuestionHistoryDto[]> {
+    const user = request.user as { userId: number; email: string };
+    return this.questionService.getAnswersByUserOrdered(user.userId);
   }
 
   // @Public()
@@ -78,5 +91,16 @@ export class QuestionController {
       body.depth,
     );
     return { success: true };
+  }
+
+  // Question 생성, subquestion도 같이 생성해야함
+  @Post('/admin/create')
+  async createNewQuestion(@Body() body: { content: IQuestionProps }) {
+    // const { question_content, subquestion, depth } = body.content;
+
+    const savedQuestion = await this.questionService.createQuestion(
+      body.content,
+    );
+    return { success: true, questionId: savedQuestion.questionId };
   }
 }

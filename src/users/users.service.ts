@@ -5,14 +5,18 @@ import { User } from '../entities/user.entity';
 import { Answer } from '@/entities/answer.entity';
 import { PasswordService } from '@/authentication/password/password.service';
 import { EncryptionService } from '@/authentication/encryption/encryption.service';
+import { Profile } from '@/entities/profile.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private usersRepository: Repository<User>,
+    @InjectRepository(Profile)
+    private profileRepository: Repository<Profile>,
     @InjectRepository(Answer)
     private readonly answerRepository: Repository<Answer>,
     private readonly passwordService: PasswordService,
+
     private readonly encryptionService: EncryptionService,
   ) {}
 
@@ -23,29 +27,6 @@ export class UsersService {
   private async decryptUserEmail(encryptedEmail: string): Promise<string> {
     return this.encryptionService.decrypt(encryptedEmail);
   }
-
-  // async createUser(data: {
-  //   email: string;
-  //   password: string;
-  //   username?: string;
-  // }): Promise<User> {
-  //   const hashedPassword = await this.passwordService.hashPassword(
-  //     data.password,
-  //   );
-  //   const encryptedEmail = await this.encryptUserEmail(data.email);
-  //   const defaultUsername =
-  //     data.username ||
-  //     this.encryptionService.extractUsernameFromEmail(data.email);
-
-  //   const newUser = this.usersRepository.create({
-  //     email: encryptedEmail,
-  //     password: hashedPassword,
-  //     username: defaultUsername,
-  //     role: 'user',
-  //   });
-
-  //   return this.usersRepository.save(newUser);
-  // }
 
   async findAll(): Promise<User[]> {
     const users = await this.usersRepository.find();
@@ -68,8 +49,9 @@ export class UsersService {
   // email은 암호화 되어 있음
   async findByEmail(email: string): Promise<User | null> {
     // 복호화 후 이메일로 사용자 조회하기
-    const user = await this.usersRepository.findOneBy({
-      email,
+    const user = await this.usersRepository.findOne({
+      where: { email },
+      withDeleted: true,
     });
     // if (user) {
     //   user.email = email; // Return the original unencrypted email
@@ -98,18 +80,22 @@ export class UsersService {
     });
 
     const savedUser = await this.usersRepository.save(newUser);
-    console.log('savedUser', savedUser);
 
-    // Decrypt email before returning
-    // savedUser.email = await this.decryptUserEmail(savedUser.email);
+    // Create a corresponding profile for the new user
+    const newProfile = this.profileRepository.create({
+      userId: savedUser.id,
+      username: data.username,
+    });
+    await this.profileRepository.save(newProfile);
+
     return savedUser;
   }
 
   // 사용자의 답변 조회 메서드
   async getUserAnswers(userId: number): Promise<Answer[]> {
     // 사용자 존재 확인
-    const user = await this.findOne(userId);
-    console.log('user', user);
+    // const user = await this.findOne(userId);
+    // console.log('user', user);
 
     // 해당 사용자의 답변 조회
     return this.answerRepository.find({
@@ -171,5 +157,18 @@ export class UsersService {
     }
 
     await this.usersRepository.delete(userId);
+  }
+
+  async restoreUser(userId: number): Promise<void> {
+    const user = await this.usersRepository.findOne({
+      where: { id: userId },
+      withDeleted: true,
+    });
+    if (!user) {
+      throw new NotFoundException('사용자를 찾을 수 없습니다.');
+    }
+    // deleted_at을 null로 만들어 계정을 복원
+    user.deleted_at = null;
+    await this.usersRepository.save(user);
   }
 }

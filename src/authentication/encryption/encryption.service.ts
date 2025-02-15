@@ -1,39 +1,3 @@
-// import { Injectable } from '@nestjs/common';
-// import * as CryptoJS from 'crypto-js';
-
-// @Injectable()
-// export class EncryptionService {
-//   private readonly SECRET_KEY = process.env.ENCRYPTION_KEY;
-
-//   /**
-//    * Encrypt a string using AES encryption
-//    * @param text Text to encrypt
-//    * @returns Encrypted text
-//    */
-//   encrypt(text: string): string {
-//     return CryptoJS.AES.encrypt(text, this.SECRET_KEY).toString();
-//   }
-
-//   /**
-//    * Decrypt an encrypted string
-//    * @param encryptedText Text to decrypt
-//    * @returns Decrypted text
-//    */
-//   decrypt(encryptedText: string): string {
-//     const bytes = CryptoJS.AES.decrypt(encryptedText, this.SECRET_KEY);
-//     return bytes.toString(CryptoJS.enc.Utf8);
-//   }
-
-//   /**
-//    * Extract username from email (part before @)
-//    * @param email Email address
-//    * @returns Username portion of email
-//    */
-//   extractUsernameFromEmail(email: string): string {
-//     return email.split('@')[0];
-//   }
-// }
-
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as CryptoJS from 'crypto-js';
@@ -74,8 +38,12 @@ export class EncryptionService {
     const deterministicIV = this.configService.get<string>('DETERMINISTIC_IV');
 
     const iv = CryptoJS.enc.Utf8.parse(deterministicIV);
+
     const decrypted = CryptoJS.AES.decrypt(encryptedText, key, { iv });
-    return decrypted.toString(CryptoJS.enc.Utf8);
+
+    const test = decrypted.toString(CryptoJS.enc.Utf8);
+
+    return test;
   }
 
   /**

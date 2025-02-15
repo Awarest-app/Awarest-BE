@@ -18,6 +18,7 @@ export class QuestionMapping {
   @Column({ name: 'category_value' })
   categoryValue: string; // 예: "20대", "학생", "다이어트"
 
+  // 이건 뭘까요?
   @Column({ nullable: true })
   depth: string; //
 

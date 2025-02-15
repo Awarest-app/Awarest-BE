@@ -9,6 +9,6 @@ import { QuestionMappingService } from './question-mapping.service';
   imports: [TypeOrmModule.forFeature([QuestionMapping])],
   providers: [QuestionMappingService],
   controllers: [QuestionMappingController],
-  exports: [QuestionMappingService], // 다른 모듈에서 사용할 수 있도록 내보냄
+  exports: [QuestionMappingService],
 })
 export class QuestionMappingModule {}

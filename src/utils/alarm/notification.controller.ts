@@ -1,18 +1,24 @@
-import { FirebaseService } from '@/utils/firebase/firebase.service';
-import { Controller, Post, Body } from '@nestjs/common';
-// import { FirebaseService } from './firebase.service';
+import { Controller, Post, Body, Req } from '@nestjs/common';
+import { NotificationService } from './notification.service';
+import { jwtRequest } from '@/type/request.interface';
 
-@Controller('notifications')
+@Controller('api/notifications')
 export class NotificationController {
-  constructor(private readonly firebaseService: FirebaseService) {}
+  constructor(private readonly notificationService: NotificationService) {}
 
+  /**
+   * 디바이스 토큰을 등록/업데이트하는 엔드포인트
+   * @param request JWT 요청 객체 (사용자 정보 포함)
+   * @param body 디바이스 토큰 정보
+   */
   @Post('send')
-  async sendNotification(
-    @Body('deviceToken') deviceToken: string,
-    @Body('title') title: string,
-    @Body('body') body: string,
+  async updateDeviceToken(
+    @Req() request: jwtRequest,
+    @Body() body: { token: string },
   ) {
-    await this.firebaseService.sendPushNotification(deviceToken, title, body);
-    return { message: '푸시 알림이 전송되었습니다!' };
+    console.log('deviceToken', body.token);
+    const userId = request.user.userId;
+    await this.notificationService.updateDeviceToken(userId, body.token);
+    return { message: '디바이스 토큰이 업데이트되었습니다.' };
   }
 }
