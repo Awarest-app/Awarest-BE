@@ -41,6 +41,8 @@ services:
     # - '${NEST_PORT}:3000'
     expose:
       - 3000
+    volumes:
+      - ../config/firebase-adminsdk.json:/app/config/firebase-adminsdk.json:ro
     depends_on:
       - db
     networks:
