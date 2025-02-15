@@ -128,25 +128,11 @@ export class NotificationService {
    */
   async updateDeviceToken(userId: number, deviceToken: string): Promise<void> {
     const profile = await this.profileRepository.findOne({ where: { userId } });
-
-    if (profile) {
-      // 프로필이 존재하면 디바이스 토큰 업데이트
-      profile.deviceToken = deviceToken;
-      await this.profileRepository.save(profile);
-    } else {
-      // 프로필이 없으면 새로 생성
-      const newProfile = this.profileRepository.create({
-        userId,
-        deviceToken,
-        day_streak: 0,
-        total_xp: 0,
-        level: 1,
-        total_answers: 0,
-        achievements: 0,
-        joined_date: new Date(),
-        noti: true, // 토큰을 등록하면 알림을 활성화로 설정
-      });
-      await this.profileRepository.save(newProfile);
+    if (!profile) {
+      throw new Error('프로필을 찾을 수 없습니다.');
     }
+
+    profile.deviceToken = deviceToken;
+    await this.profileRepository.save(profile);
   }
 }

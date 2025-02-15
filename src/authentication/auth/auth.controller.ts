@@ -13,6 +13,7 @@ import {
 // import { LocalAuthGuard } from './guards/local_auth.guard';
 import { AuthService } from './auth.service';
 import { UsersService } from '@/users/users.service';
+import { UserCleanupService } from '@/users/user-cleanup.service';
 import { AuthRequest, jwtRequest } from '@/type/request.interface';
 import { Response } from 'express';
 import { Public } from '../jwt/public.decorator';
@@ -28,6 +29,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
+    private readonly userCleanupService: UserCleanupService,
   ) {}
 
   @Post('login')
@@ -102,36 +104,42 @@ export class AuthController {
     }
   }
 
-  // 회원 탈퇴 기능 (DELETE 요청)
+  /**
+   * 회원 탈퇴 기능 - 7일의 유예 기간을 제공
+   * 1. 리프레시 토큰을 즉시 폐기
+   * 2. 계정을 소프트 삭제 상태로 변경
+   * 3. 7일 후 자동으로 완전히 삭제됨
+   */
   @Delete('delete')
   async deleteUser(@Req() request: jwtRequest, @Res() res: Response) {
     try {
       const jwtUser = request.user;
-      // 리프레시 토큰 검증
-      // const payload = this.authService.verifyRefreshToken(refreshToken);
-
-      // 사용자 찾기
       const user = await this.usersService.findOne(jwtUser.userId);
+
       if (!user) {
         throw new HttpException(
-          '유효하지 않은 리프레시 토큰입니다.',
-          HttpStatus.UNAUTHORIZED,
+          '사용자를 찾을 수 없습니다.',
+          HttpStatus.NOT_FOUND,
         );
       }
 
-      // console.log('delete user', user);
-      // // 리프레시 토큰 폐기
-      // await this.authService.revokeRefreshToken(user.id);
+      // 리프레시 토큰 즉시 폐기
+      await this.authService.revokeRefreshToken(user.id);
 
-      // 사용자 삭제
-      await this.usersService.deleteUser(user.id);
+      // 계정 소프트 삭제 표시 (7일 후 자동 삭제)
+      await this.userCleanupService.markUserForDeletion(user.id);
 
-      // return { message: '사용자가 성공적으로 삭제되었습니다.' };
-      return res.status(200).json({ message: 'user delete sceess' });
+      return res.status(200).json({
+        message:
+          '계정이 삭제 대기 상태로 변경되었습니다. 7일 이내에 로그인하시면 계정이 복구됩니다.',
+      });
     } catch (error) {
+      if (error instanceof HttpException) {
+        throw error;
+      }
       throw new HttpException(
-        'failed to user delete ',
-        HttpStatus.UNAUTHORIZED,
+        '계정 삭제 처리 중 오류가 발생했습니다.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }

@@ -23,6 +23,7 @@ import { RedisModule } from './redis/redis.module';
 import { ProfileModule } from './profile/profile.module';
 import { NotificationModule } from './utils/alarm/notification.module';
 import * as path from 'path';
+import { MailModule } from './utils/mail/mail.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import * as path from 'path';
     }),
     PassportModule.register({ defaultStrategy: 'jwt' }),
     TypeOrmModule.forRootAsync({ useFactory: ormConfig }),
+    MailModule,
     RedisModule,
     UsersModule,
     OauthModule,

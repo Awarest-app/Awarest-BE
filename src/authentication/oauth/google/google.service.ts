@@ -33,6 +33,10 @@ export class GoogleService {
 
     if (user) {
       // 이미 등록된 이메일 유저면 동일 인물로 판단
+      // 등록되었는데 delete_at된 유저면 복구시키기
+      if (user.deleted_at) {
+        await this.usersService.restoreUser(user.id);
+      }
       return user;
     }
 
