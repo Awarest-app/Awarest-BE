@@ -130,12 +130,12 @@ export class DailyQuestionService {
 
     // Redis에서 기존 세트 조회
     const data = await client.get(redisKey);
-    console.log('getTodayQuestionsForUser data', data, redisKey);
+    // console.log('getTodayQuestionsForUser data', data, redisKey);
 
     if (data) {
       const parsed = JSON.parse(data);
 
-      console.log('getTodayQuestionsForUser parsed', parsed);
+      // console.log('getTodayQuestionsForUser parsed', parsed);
       // 오늘 날짜와 동일하면 그대로 반환
       if (parsed.date === todayStr) {
         return parsed.questions;
@@ -166,7 +166,7 @@ export class DailyQuestionService {
     } else {
       // 새로운 질문 세트 생성
       const newQuestionIds = await this.getNewQuestionIds(userId, [], 3);
-      console.log('not key questionids', newQuestionIds);
+      // console.log('not key questionids', newQuestionIds);
       const newData = {
         date: todayStr,
         questions: newQuestionIds.map((id) => ({

@@ -16,7 +16,8 @@ export class QuestionController {
       user.userId,
     );
 
-    console.log('questionSet', questionSet);
+    // console.log('questionSet', questionSet);
+
     // questionSet = [{ questionId: number, answered: boolean }, ...]
     // -> 실제 Question 엔티티 정보까지 필요하다면, questionId로 DB 조회 후, answered 상태를 함께 반환
     // 간단 예시
@@ -27,7 +28,7 @@ export class QuestionController {
       user.userId,
       questionIds,
     );
-    console.log('questions', questions);
+    // console.log('questions', questions);
 
     // 응답 포맷: QuestionProps 형식으로 변환
     const response = questions.map((question) => ({

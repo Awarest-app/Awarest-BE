@@ -103,20 +103,24 @@ export class QuestionManagementService {
     depth: number,
   ): Promise<Question> {
     // 1. 질문 저장
+    console.log('outer createQuestion', questionContent, subquestions, depth);
     const question = this.questionRepo.create({
       content: questionContent,
       depth: depth,
     });
     const savedQuestion = await this.questionRepo.save(question);
+    console.log('savedQuestion', savedQuestion);
 
     // 2. subquestion들을 순서(order)를 부여하면서 저장
     for (let i = 0; i < subquestions.length; i++) {
+      console.log('subquestions [i]', subquestions[i]);
       if (subquestions[i] == null) {
         console.warn(
           `Subquestion at index ${i} is null or undefined. Skipping...`,
         );
         continue;
       }
+
       const subq = this.subQuestionRepo.create({
         questionId: savedQuestion.questionId,
         content: subquestions[i],
@@ -124,6 +128,7 @@ export class QuestionManagementService {
       await this.subQuestionRepo.save(subq);
     }
 
+    console.log('categoryOptions');
     // 각 카테고리별 옵션 설정
     const categoryOptions = [
       { categoryName: 'age', options: ageGroups },
