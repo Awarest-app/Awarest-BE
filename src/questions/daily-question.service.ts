@@ -67,6 +67,7 @@ export class DailyQuestionService {
 
     // 질문 매핑 정보 조회, 하나라도 survey가 겹치면 가져옴
     const mappings = await this.questionMapRepo.find({ where: orConditions });
+    console.log('survey mapping', mappings);
 
     // 이미 답변한 질문 제외
     const userQuestions = await this.userQuestionRepo.find({
@@ -78,6 +79,7 @@ export class DailyQuestionService {
     const filteredMappings = mappings.filter(
       (map) => !allExcluded.has(map.questionId),
     );
+    console.log('filtered mappings', filteredMappings);
 
     // 가중치 계산
     const weightMap: Record<number, number> = {};
@@ -90,6 +92,7 @@ export class DailyQuestionService {
 
     let validQuestionIds: number[] = [];
     const questionIdsFromMapping = Object.keys(weightMap).map(Number);
+    console.log('questionIdsFromMapping', questionIdsFromMapping);
 
     // 가중치에 해당하는 question이 3개 이상인 경우
     if (questionIdsFromMapping.length >= 3) {
@@ -127,9 +130,12 @@ export class DailyQuestionService {
 
     // Redis에서 기존 세트 조회
     const data = await client.get(redisKey);
+    console.log('getTodayQuestionsForUser data', data);
+
     if (data) {
       const parsed = JSON.parse(data);
 
+      console.log('getTodayQuestionsForUser parsed', parsed);
       // 오늘 날짜와 동일하면 그대로 반환
       if (parsed.date === todayStr) {
         return parsed.questions;

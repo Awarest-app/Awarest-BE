@@ -93,6 +93,7 @@ export class QuestionService {
    */
   createQuestion(content: IQuestionProps): Promise<Question> {
     const { question_content, subquestion, depth } = content;
+    console.log('outer createQuestion', question_content, subquestion, depth);
     return this.questionManagementService.createQuestion(
       question_content,
       subquestion,

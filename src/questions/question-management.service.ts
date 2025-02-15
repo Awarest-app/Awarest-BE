@@ -103,6 +103,7 @@ export class QuestionManagementService {
     depth: number,
   ): Promise<Question> {
     // 1. 질문 저장
+    console.log('inner createQuestion', questionContent, subquestions, depth);
     const question = this.questionRepo.create({
       content: questionContent,
       depth: depth,
