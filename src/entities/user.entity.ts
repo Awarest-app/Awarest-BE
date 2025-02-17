@@ -25,7 +25,9 @@ export class User {
   age: number;
 
   @Column({ nullable: true })
-  country: string;
+  date_diff: number;
+  // @Column({ nullable: true })
+  // country: string;
 
   @Column({ nullable: true })
   password: string; // 일반 로그인 시 사용

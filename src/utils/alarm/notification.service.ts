@@ -5,113 +5,104 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, LessThan } from 'typeorm';
 import { Question } from '@/entities/question.entity';
 import { Profile } from '@/entities/profile.entity';
+import { User } from '@/entities/user.entity';
 import { UserQuestion } from '@/entities/user-question.entity';
 
 @Injectable()
 export class NotificationService {
-  // private readonly predefinedMessages = [
-  //   '오늘의 질문이 도착했어요! 지금 확인해보세요.',
-  //   '새로운 질문이 기다리고 있어요. 함께 생각해볼까요?',
-  //   '오늘도 성장하는 하루 되세요! 새로운 질문이 도착했습니다.',
-  // ];
-
   constructor(
     private readonly firebaseService: FirebaseService,
     @InjectRepository(Question)
     private readonly questionRepository: Repository<Question>,
     @InjectRepository(Profile)
     private readonly profileRepository: Repository<Profile>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     @InjectRepository(UserQuestion)
     private readonly userQuestionRepository: Repository<UserQuestion>,
   ) {}
 
-  // private getRandomMessage(): string {
-  //   const randomIndex = Math.floor(
-  //     Math.random() * this.predefinedMessages.length,
-  //   );
-  //   return this.predefinedMessages[randomIndex];
-  // }
-
+  /**
+   * 사용자가 답변하지 않은 랜덤 질문을 가져오는 함수
+   * @param userId 사용자 ID
+   * @returns 랜덤 질문 또는 null (모든 질문에 답변한 경우)
+   */
   private async getRandomUnansweredQuestion(
     userId: number,
   ): Promise<Question | null> {
-    // Get all questions the user has already answered
+    // 사용자가 답변한 모든 질문 ID 가져오기
     const answeredQuestions = await this.userQuestionRepository.find({
       where: { userId },
       select: ['questionId'],
     });
     const answeredQuestionIds = answeredQuestions.map((uq) => uq.questionId);
 
-    // Get a random unanswered question
-    const query = this.questionRepository.createQueryBuilder('question');
-
-    if (answeredQuestionIds.length > 0) {
-      query.where('question.question_id NOT IN (:...ids)', {
-        ids: answeredQuestionIds,
-      });
+    // 답변하지 않은 질문이 있는지 확인
+    const totalQuestions = await this.questionRepository.count();
+    if (answeredQuestionIds.length >= totalQuestions) {
+      return null; // 모든 질문에 답변함
     }
 
+    // 답변하지 않은 질문 중 랜덤으로 하나 선택
+    const query = this.questionRepository.createQueryBuilder('question');
+    if (answeredQuestionIds.length > 0) {
+      query.where('question.id NOT IN (:...ids)', { ids: answeredQuestionIds });
+    }
     query.orderBy('RANDOM()').take(1);
 
     return query.getOne();
   }
 
-  // @Cron('*/10 * * * * *') // Every 10 seconds
-  @Cron('0 0 7 * * *') // Every day at 7:00 AM
-  async sendMorningNotification() {
+  /**
+   * 매 시간마다 실행되어 각 사용자의 현지 시간이 7시나 19시인 경우 알림을 보내는 함수
+   */
+  // @Cron('0 * * * * *') // Every hour at minute 0
+  @Cron('0 0 * * * *') // Every hour at minute 0
+  async sendTimezoneAwareNotifications() {
+    // 현재 UTC 시간 가져오기
+    const now = new Date();
+    const utcHour = now.getUTCHours();
+    // console.log('utcHour', utcHour);
+
+    // const userLocalHour = (utcHour + 9 + 24) % 24;
+    // console.log('userLocalHour', userLocalHour);
+
+    // 알림이 활성화된 모든 프로필 가져오기
     const profiles = await this.profileRepository.find({
-      where: { noti: true }, // Only send to users who enabled notifications
+      where: { noti: true },
+      relations: ['user'], // User 엔티티와 조인
     });
 
     for (const profile of profiles) {
-      const randomQuestion = await this.getRandomUnansweredQuestion(
-        profile.userId,
-      );
+      if (!profile.user?.date_diff) continue; // date_diff가 없는 사용자는 스킵
 
-      // randomQuestion이 없으면 (모든 질문 완료) 해당 사용자에게 알림을 보내지 않음
-      if (!randomQuestion) {
-        console.log(
-          `User ${profile.userId} has completed all questions. Skipping notification.`,
+      // 사용자의 현지 시간 계산
+      const userLocalHour = (utcHour + profile.user.date_diff + 24) % 24;
+      // console.log('userLocalHour', userLocalHour);
+
+      // 사용자의 현지 시간이 7시나 19시인 경우에만 알림 전송
+      if (userLocalHour === 7 || userLocalHour === 19) {
+        const randomQuestion = await this.getRandomUnansweredQuestion(
+          profile.userId,
         );
-        continue;
-      }
 
-      const message = randomQuestion.content;
-      // console.log('message', message);
+        // randomQuestion이 없으면 (모든 질문 완료) 해당 사용자에게 알림을 보내지 않음
+        if (!randomQuestion) {
+          console.log(
+            `User ${profile.userId} has completed all questions. Skipping notification.`,
+          );
+          continue;
+        }
+        const message = randomQuestion.content;
 
-      await this.firebaseService.sendPushNotification(
-        profile.deviceToken,
-        'today question',
-        message,
-      );
-    }
-  }
+        const title = 'today question';
 
-  @Cron('0 0 19 * * *') // Every day at 7:00 PM
-  async sendEveningNotification() {
-    const profiles = await this.profileRepository.find({
-      where: { noti: true }, // Only send to users who enabled notifications
-    });
-
-    for (const profile of profiles) {
-      const randomQuestion = await this.getRandomUnansweredQuestion(
-        profile.userId,
-      );
-
-      // randomQuestion이 없으면 (모든 질문 완료) 해당 사용자에게 알림을 보내지 않음
-      if (!randomQuestion) {
-        console.log(
-          `User ${profile.userId} has completed all questions. Skipping notification.`,
+        await this.firebaseService.sendPushNotification(
+          profile.deviceToken,
+          title,
+          message,
         );
-        continue;
       }
-      const message = randomQuestion.content;
-
-      await this.firebaseService.sendPushNotification(
-        profile.deviceToken,
-        'today question',
-        message,
-      );
     }
   }
 
@@ -143,25 +134,11 @@ export class NotificationService {
    */
   async updateDeviceToken(userId: number, deviceToken: string): Promise<void> {
     const profile = await this.profileRepository.findOne({ where: { userId } });
-
-    if (profile) {
-      // 프로필이 존재하면 디바이스 토큰 업데이트
-      profile.deviceToken = deviceToken;
-      await this.profileRepository.save(profile);
-    } else {
-      // 프로필이 없으면 새로 생성
-      const newProfile = this.profileRepository.create({
-        userId,
-        deviceToken,
-        day_streak: 0,
-        total_xp: 0,
-        level: 1,
-        total_answers: 0,
-        achievements: 0,
-        joined_date: new Date(),
-        noti: true, // 토큰을 등록하면 알림을 활성화로 설정
-      });
-      await this.profileRepository.save(newProfile);
+    if (!profile) {
+      throw new Error('프로필을 찾을 수 없습니다.');
     }
+
+    profile.deviceToken = deviceToken;
+    await this.profileRepository.save(profile);
   }
 }

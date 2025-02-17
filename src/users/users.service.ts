@@ -171,4 +171,37 @@ export class UsersService {
     user.deleted_at = null;
     await this.usersRepository.save(user);
   }
+
+  /**
+   * 사용자의 현지 시간을 받아 서버 시간과의 차이를 계산하고 저장하는 함수
+   * @param userId 사용자 ID
+   * @param localTimeStr ISO 8601 형식의 현지 시간 문자열
+   */
+  async updateLocalTime(userId: number, localTimeStr: string): Promise<void> {
+    const user = await this.findOne(userId);
+    if (!user) {
+      throw new NotFoundException('사용자를 찾을 수 없습니다.');
+    }
+
+    // 현재 UTC 시간
+    const serverTime = new Date();
+    // 클라이언트에서 보낸 현지 시간을 Date 객체로 변환
+    const localTime = new Date(localTimeStr);
+
+    // 시차 계산 (시간 단위)
+    const serverHour = serverTime.getUTCHours();
+    const localHour = localTime.getHours();
+
+    // 시차 계산 (-12 ~ +14 범위 내에서)
+    let dateDiff = localHour - serverHour;
+    if (dateDiff > 12) {
+      dateDiff -= 24;
+    } else if (dateDiff < -12) {
+      dateDiff += 24;
+    }
+
+    // 시차 저장
+    user.date_diff = dateDiff;
+    await this.usersRepository.save(user);
+  }
 }
