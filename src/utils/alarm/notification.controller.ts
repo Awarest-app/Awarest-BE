@@ -16,7 +16,7 @@ export class NotificationController {
     @Req() request: jwtRequest,
     @Body() body: { token: string },
   ) {
-    console.log('deviceToken', body.token);
+    // console.log('deviceToken', body.token);
     const userId = request.user.userId;
     await this.notificationService.updateDeviceToken(userId, body.token);
     return { message: '디바이스 토큰이 업데이트되었습니다.' };

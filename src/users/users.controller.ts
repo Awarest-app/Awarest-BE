@@ -1,7 +1,6 @@
 import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
 import { User } from '../entities/user.entity';
 import { UsersService } from './users.service';
-import { UpdateLocalTimeDto } from './dto/update-local-time.dto';
 import { jwtRequest } from '@/type/request.interface';
 
 @Controller('api/users')

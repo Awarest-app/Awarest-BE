@@ -84,7 +84,7 @@ export class DailyQuestionService {
 
     // 질문 매핑 정보 조회, 하나라도 survey가 겹치면 가져옴
     const mappings = await this.questionMapRepo.find({ where: orConditions });
-    console.log('survey mapping', mappings);
+    // console.log('survey mapping', mappings);
 
     // 이미 답변한 질문 제외
     const userQuestions = await this.userQuestionRepo.find({

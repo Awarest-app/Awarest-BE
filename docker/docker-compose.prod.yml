@@ -20,6 +20,12 @@ services:
     container_name: redis
     ports:
       - '6379:6379'
+    volumes:
+      # 1) /data 디렉토리를 호스트의 볼륨과 연결 -> RDB 파일이 재시작 후에도 유지
+      - redis-data:/data
+      # 2) 커스텀 설정 파일 마운트
+      - ../config/redis.conf:/usr/local/etc/redis/redis.conf:ro # 상대 경로 사용
+
     # 필요하면 volume, 환경 변수, 비밀번호 설정 등 추가 가능
     # environment:
     #   REDIS_PASSWORD: example
