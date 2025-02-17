@@ -6,13 +6,14 @@ import { UsersService } from './users.service';
 import { UserCleanupService } from './user-cleanup.service';
 import { User } from '../entities/user.entity';
 import { Answer } from '@/entities/answer.entity';
+import { Survey } from '@/entities/survey.entity';
 import { PasswordModule } from '@/authentication/password/password.module';
 import { EncryptionModule } from '@/authentication/encryption/encryption.module';
 import { Profile } from '@/entities/profile.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Answer, Profile]),
+    TypeOrmModule.forFeature([User, Answer, Profile, Survey]),
     ScheduleModule.forRoot(),
     PasswordModule,
     EncryptionModule,

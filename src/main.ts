@@ -18,6 +18,7 @@ async function bootstrap() {
       'https://adminhi.getawarest.com',
       'https://beapiserver.getawarest.com',
       'awaerst://',
+      'http://localhost:5173',
     ], // React Native 앱의 도메인
     // origin: '*', // 혹은 ['https://your-mobile-app-domain.com']
     // methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
@@ -25,7 +26,7 @@ async function bootstrap() {
     credentials: true,
     allowedHeaders: [
       'Origin',
-      // 'Authorization',
+      'Authorization',
       'Accept',
       'Content-Type',
       'Authorization',

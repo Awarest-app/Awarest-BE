@@ -3,9 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
 import { Answer } from '@/entities/answer.entity';
+import { Survey } from '@/entities/survey.entity';
 import { PasswordService } from '@/authentication/password/password.service';
 import { EncryptionService } from '@/authentication/encryption/encryption.service';
 import { Profile } from '@/entities/profile.entity';
+import { AdminUserResponseDto } from './dto/admin-user-response.dto';
 
 @Injectable()
 export class UsersService {
@@ -15,8 +17,9 @@ export class UsersService {
     private profileRepository: Repository<Profile>,
     @InjectRepository(Answer)
     private readonly answerRepository: Repository<Answer>,
+    @InjectRepository(Survey)
+    private readonly surveyRepository: Repository<Survey>,
     private readonly passwordService: PasswordService,
-
     private readonly encryptionService: EncryptionService,
   ) {}
 
@@ -173,35 +176,84 @@ export class UsersService {
   }
 
   /**
+   * 관리자용 사용자 정보 조회
+   * 사용자명, 이메일, 설문 결과, 답변 날짜 목록을 반환
+   */
+  async findAllForAdmin(): Promise<AdminUserResponseDto[]> {
+    // 모든 사용자 조회 (삭제된 사용자 제외)
+    const users = await this.usersRepository.find();
+    const result: AdminUserResponseDto[] = [];
+
+    for (const user of users) {
+      // 설문 결과 조회
+      const survey = await this.surveyRepository.findOne({
+        where: { userId: user.id },
+      });
+
+      // 답변 날짜 조회 및 중복 제거
+      const answers = await this.answerRepository.find({
+        where: { userId: user.id },
+        select: ['submittedAt'],
+      });
+
+      // 날짜만 추출하고 중복 제거 (YYYY-MM-DD 형식)
+      const uniqueDates = [
+        ...new Set(
+          answers.map((answer) => {
+            const date = new Date(answer.submittedAt);
+            return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+          }),
+        ),
+      ].sort();
+
+      // 이메일 복호화
+      const decryptedEmail = await this.decryptUserEmail(user.email);
+
+      result.push({
+        username: user.username,
+        email: decryptedEmail,
+        survey: {
+          ageRange: survey?.ageRange,
+          job: survey?.job,
+          goal: survey?.goal,
+        },
+        answerDates: uniqueDates,
+      });
+    }
+
+    return result;
+  }
+
+  /**
    * 사용자의 현지 시간을 받아 서버 시간과의 차이를 계산하고 저장하는 함수
    * @param userId 사용자 ID
    * @param localTimeStr ISO 8601 형식의 현지 시간 문자열
    */
-  async updateLocalTime(userId: number, localTimeStr: string): Promise<void> {
+  async updateLocalTime(userId: number, localTimeStr: number): Promise<void> {
     const user = await this.findOne(userId);
     if (!user) {
       throw new NotFoundException('사용자를 찾을 수 없습니다.');
     }
 
-    // 현재 UTC 시간
-    const serverTime = new Date();
-    // 클라이언트에서 보낸 현지 시간을 Date 객체로 변환
-    const localTime = new Date(localTimeStr);
+    // // 현재 UTC 시간
+    // const serverTime = new Date();
+    // // 클라이언트에서 보낸 현지 시간을 Date 객체로 변환
+    // const localTime = new Date(localTimeStr);
 
-    // 시차 계산 (시간 단위)
-    const serverHour = serverTime.getUTCHours();
-    const localHour = localTime.getHours();
+    // // 시차 계산 (시간 단위)
+    // const serverHour = serverTime.getUTCHours();
+    // const localHour = localTime.getHours();
 
-    // 시차 계산 (-12 ~ +14 범위 내에서)
-    let dateDiff = localHour - serverHour;
-    if (dateDiff > 12) {
-      dateDiff -= 24;
-    } else if (dateDiff < -12) {
-      dateDiff += 24;
-    }
+    // // 시차 계산 (-12 ~ +14 범위 내에서)
+    // let dateDiff = localHour - serverHour;
+    // if (dateDiff > 12) {
+    //   dateDiff -= 24;
+    // } else if (dateDiff < -12) {
+    //   dateDiff += 24;
+    // }
 
     // 시차 저장
-    user.date_diff = dateDiff;
+    user.date_diff = localTimeStr;
     await this.usersRepository.save(user);
   }
 }
