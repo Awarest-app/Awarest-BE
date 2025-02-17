@@ -22,10 +22,14 @@ export class UsersController {
    * 사용자의 현지 시간을 받아 시차(date_diff)를 계산하고 저장하는 엔드포인트
    */
   @Post('time')
-  async updateLocalTime(@Req() request: jwtRequest, @Body() localTime: number) {
+  async updateLocalTime(
+    @Req() request: jwtRequest,
+    // @Body() { localTime: number },
+    @Body() body: { localTime: number },
+  ) {
     const userId = request.user.userId;
-    console.log('localTime: ', localTime);
-    await this.usersService.updateLocalTime(userId, localTime);
+    console.log('localTime: ', body.localTime);
+    await this.usersService.updateLocalTime(userId, body.localTime);
     return { message: '시차 정보가 업데이트되었습니다.' };
   }
 
