@@ -16,8 +16,9 @@ import { MailService } from './mail.service';
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         transport: {
-          host: 'smtp.privaterelay.appleid.com', // Apple SMTP 서버
+          host: 'smtp.gmail.com', // Apple SMTP 서버
           port: 465,
+          // port: 587,
           secure: true,
           auth: {
             // ConfigService를 사용하여 환경변수 값들을 불러옵니다.
@@ -26,7 +27,7 @@ import { MailService } from './mail.service';
           },
         },
         defaults: {
-          from: '"Awarest" <noreply@getawarest.com>', //// 반드시 Apple 인증 도메인 사용
+          from: '"Awarest" <team@getawarest.com>', //// 반드시 Apple 인증 도메인 사용
         },
       }),
     }),

@@ -81,7 +81,7 @@ export class NotificationService {
 
       await this.firebaseService.sendPushNotification(
         profile.deviceToken,
-        '오늘의 질문',
+        'today question',
         message,
       );
     }
@@ -109,7 +109,7 @@ export class NotificationService {
 
       await this.firebaseService.sendPushNotification(
         profile.deviceToken,
-        '저녁 질문',
+        'today question',
         message,
       );
     }
