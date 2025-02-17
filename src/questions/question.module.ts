@@ -15,6 +15,7 @@ import { AnswerManagementService } from './answer-management.service';
 import { QuestionManagementService } from './question-management.service';
 import { ProfileXpService } from '@/profile/profile-xp.service';
 import { Subquestion } from '@/entities/subquestion.entity';
+import { User } from '@/entities/user.entity';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { Subquestion } from '@/entities/subquestion.entity';
       Profile,
       Level,
       Subquestion,
+      User,
     ]),
     RedisModule,
   ],

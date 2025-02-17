@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Not, In } from 'typeorm';
 import { Question } from '@/entities/question.entity';
@@ -6,6 +6,7 @@ import { QuestionMapping } from '@/entities/question-mapping.entity';
 import { Survey } from '@/entities/survey.entity';
 import { UserQuestion } from '@/entities/user-question.entity';
 import { RedisService } from '@/redis/redis.service';
+import { User } from '@/entities/user.entity';
 
 @Injectable()
 export class DailyQuestionService {
@@ -18,6 +19,8 @@ export class DailyQuestionService {
     private readonly questionRepo: Repository<Question>,
     @InjectRepository(UserQuestion)
     private readonly userQuestionRepo: Repository<UserQuestion>,
+    @InjectRepository(User)
+    private readonly userRepo: Repository<User>,
     private readonly redisService: RedisService,
   ) {}
 
@@ -30,6 +33,20 @@ export class DailyQuestionService {
     const month = String(today.getMonth() + 1).padStart(2, '0');
     const day = String(today.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
+  }
+
+  /**
+   * UTC를 LOCAL로 변환
+   */
+  private getUserLocalDateStr(dateDiff: number): string {
+    // 현재 UTC 시각
+    const nowUTC = new Date();
+
+    // user.date_diff(시차)를 적용하여 "사용자 로컬 시각" 계산
+    const localTime = new Date(nowUTC.getTime() + dateDiff * 60 * 60 * 1000);
+
+    // YYYY-MM-DD 형식으로 반환
+    return localTime.toISOString().split('T')[0];
   }
 
   /**
@@ -126,17 +143,25 @@ export class DailyQuestionService {
   ): Promise<{ questionId: number; answered: boolean }[]> {
     const client = this.redisService.getClient();
     const redisKey = `user_daily_questions:${userId}`;
-    const todayStr = this.getCurrentDateStr();
 
-    // Redis에서 기존 세트 조회
+    // (1) 사용자 정보 조회 (date_diff 읽어오기)
+    const user = await this.userRepo.findOneBy({ id: userId });
+    if (!user) {
+      throw new NotFoundException(`User with id ${userId} not found`);
+    }
+
+    // (2) date_diff가 없다면 0(UTC)으로 처리
+    const userOffset = user.date_diff ?? 0;
+
+    // (3) 사용자 로컬 날짜 문자열 구하기
+    const todayStr = this.getUserLocalDateStr(userOffset);
+
+    // Redis에서 기존 데이터 조회
     const data = await client.get(redisKey);
-    // console.log('getTodayQuestionsForUser data', data, redisKey);
 
     if (data) {
       const parsed = JSON.parse(data);
 
-      // console.log('getTodayQuestionsForUser parsed', parsed);
-      // 오늘 날짜와 동일하면 그대로 반환
       if (parsed.date === todayStr) {
         return parsed.questions;
       }
@@ -166,7 +191,6 @@ export class DailyQuestionService {
     } else {
       // 새로운 질문 세트 생성
       const newQuestionIds = await this.getNewQuestionIds(userId, [], 3);
-      // console.log('not key questionids', newQuestionIds);
       const newData = {
         date: todayStr,
         questions: newQuestionIds.map((id) => ({
