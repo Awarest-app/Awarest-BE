@@ -46,7 +46,10 @@ export class NotificationService {
     // 답변하지 않은 질문 중 랜덤으로 하나 선택
     const query = this.questionRepository.createQueryBuilder('question');
     if (answeredQuestionIds.length > 0) {
-      query.where('question.id NOT IN (:...ids)', { ids: answeredQuestionIds });
+      // query.where('question.id NOT IN (:...ids)', { ids: answeredQuestionIds });
+      query.where('question.question_id NOT IN (:...ids)', {
+        ids: answeredQuestionIds,
+      });
     }
     query.orderBy('RANDOM()').take(1);
 
@@ -77,7 +80,7 @@ export class NotificationService {
       // console.log('userLocalHour', userLocalHour);
 
       // 사용자의 현지 시간이 7시나 19시인 경우에만 알림 전송
-      if (userLocalHour === 7 || userLocalHour === 19) {
+      if (userLocalHour === 7 || userLocalHour === 14) {
         const randomQuestion = await this.getRandomUnansweredQuestion(
           profile.userId,
         );

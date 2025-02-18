@@ -20,6 +20,7 @@ export class UsersController {
 
   /**
    * 사용자의 현지 시간을 받아 시차(date_diff)를 계산하고 저장하는 엔드포인트
+   * localTime이 utc와 차이를 반환해줌
    */
   @Post('time')
   async updateLocalTime(
