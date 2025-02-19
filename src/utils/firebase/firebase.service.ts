@@ -30,6 +30,7 @@ export class FirebaseService implements OnModuleInit {
       },
       token: deviceToken,
     };
+    console.log('sendPushNotification', message);
 
     try {
       await admin.messaging().send(message);

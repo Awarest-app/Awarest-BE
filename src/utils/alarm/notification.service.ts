@@ -59,7 +59,7 @@ export class NotificationService {
   /**
    * 매 시간마다 실행되어 각 사용자의 현지 시간이 7시나 19시인 경우 알림을 보내는 함수
    */
-  // @Cron('0 * * * * *') // Every hour at minute 0
+  // @Cron('0 * * * * *')
   @Cron('0 0 * * * *') // Every hour at minute 0
   async sendTimezoneAwareNotifications() {
     // 현재 UTC 시간 가져오기
@@ -71,16 +71,17 @@ export class NotificationService {
       where: { noti: true },
       relations: ['user'], // User 엔티티와 조인
     });
-
+    // console.log('profiles', profiles);
     for (const profile of profiles) {
       if (!profile.user?.date_diff) continue; // date_diff가 없는 사용자는 스킵
 
       // 사용자의 현지 시간 계산
       const userLocalHour = (utcHour + profile.user.date_diff + 24) % 24;
-      // console.log('userLocalHour', userLocalHour);
+      console.log('userLocalHour', userLocalHour);
+      console.log('username', profile.user.username);
 
       // 사용자의 현지 시간이 7시나 19시인 경우에만 알림 전송
-      if (userLocalHour === 7 || userLocalHour === 14) {
+      if (userLocalHour === 7 || userLocalHour === 19) {
         const randomQuestion = await this.getRandomUnansweredQuestion(
           profile.userId,
         );
