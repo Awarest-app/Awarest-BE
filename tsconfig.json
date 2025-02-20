@@ -10,7 +10,6 @@
     "sourceMap": true,
     "baseUrl": "./",
     "outDir": "./dist",
-    // "rootDir": "./src", // ← 추가!
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": false,

@@ -39,6 +39,7 @@
     "crypto-js": "^4.2.0",
     "firebase-admin": "^13.1.0",
     "ioredis": "^5.4.2",
+    "mjml": "^4.15.3",
     "passport-apple": "^2.0.2",
     "passport-google-oauth20": "^2.0.0",
     "passport-jwt": "^4.0.1",

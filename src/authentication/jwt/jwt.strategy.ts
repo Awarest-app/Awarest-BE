@@ -60,6 +60,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     // console.log('success');
 
     // request.user에 필요한 정보를 반환
+    
     return { userId: user.id, email: user.email, username: user.username };
   }
 }

@@ -63,3 +63,4 @@ config
 .docker.env
 .env.main
 .env
+tsconfig.tsbuildinfo

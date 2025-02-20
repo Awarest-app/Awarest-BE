@@ -8,6 +8,7 @@ function ormConfig(): TypeOrmModuleOptions {
 
     // 애플리케이션이 시작될 때, 설정된 마이그레이션이 자동으로 실행
     MIGRATIONS_RUN: true,
+    // MIGRATIONS_RUN: false,
 
     // 이래서 entities경로를 domain으로 설정되어 있던건가..?
     // ENTITIES: [__dirname + '/users/entities/*{.ts,.js}'],
