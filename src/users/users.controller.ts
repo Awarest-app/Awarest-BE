@@ -12,6 +12,15 @@ export class UsersController {
   async findAll(): Promise<User[]> {
     return this.usersService.findAll();
   }
+  
+  @Get('userid')
+  async getPostByUserId(@Req() request: jwtRequest) : Promise<number> {
+    // const userId = request.user.userId;
+    const userId = Number(request.user.userId); 
+    // const user = await this.usersService.findOne(userId);
+    // user 객체에서 id만 반환합니다.
+    return userId;
+  }
 
   @Get(':id')
   async findOne(@Param('id') id: number): Promise<User> {
@@ -29,7 +38,6 @@ export class UsersController {
     @Body() body: { localTime: number },
   ) {
     const userId = request.user.userId;
-    console.log('localTime: ', body.localTime);
     await this.usersService.updateLocalTime(userId, body.localTime);
     return { message: '시차 정보가 업데이트되었습니다.' };
   }
@@ -42,5 +50,5 @@ export class UsersController {
   @Get('admin/users')
   async findAllUsers(): Promise<AdminUserResponseDto[]> {
     return this.usersService.findAllForAdmin();
-  }
+  }  
 }
